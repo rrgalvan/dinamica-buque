@@ -1,2 +1,2 @@
 # dinamica-buque
-Material relacionado con la asignatura "Dinámica del Buque" (MINO)
+Material relacionado con la asignatura "Dinámica del Buque" (Máster en Ingeniería Naval y Oceánica)

@@ -1,0 +1,64 @@
+// Problema de Stokes estacionario 2D
+//
+// * Dominio rectangular con un agujero
+// * Cálculo de la vorticidad y almacenamiento en un fichero VTK
+//   (para su posterior visualización con VTK)
+
+// Rectángulo exterior
+real xcoor = 15, ycoor = 5;
+
+int paredInf=1, paredSup=3, paredDer=2, paredIzq=4;
+int[int] paredes = [paredInf, paredSup, paredDer, paredIzq];
+int cilindro=0;
+
+border lx1(k=-xcoor,xcoor) { x=k; y=-ycoor; label=paredInf; }
+border lx2(k=-xcoor,xcoor) { x=k; y=+ycoor; label=paredSup; }
+border ly1(k=-ycoor,ycoor) { x=-xcoor; y=k; label=paredDer; }
+border ly2(k=-ycoor,ycoor) { x=+xcoor; y=k; label=paredIzq; }
+
+real R=1.5;
+border c(k=0,2*pi) { x=R*cos(k); y=R*sin(k); label=cilindro; }
+
+int nx=40, ny=15, nc=15;
+mesh Th = buildmesh( ly1(-ny)+lx1(nx)+ly2(ny)+lx2(-nx)
+     + c(-nc) );
+
+fespace Uh(Th,P2); // Espacio para velocidades
+fespace Ph(Th,P1); // Espacio para presiones
+Uh u,v,uu,vv;
+Ph p,pp;
+Ph vort; // Vorticidad
+
+real nu=1; // Viscodidad cinemática (=mu/rho, con mu=visc. dinámica y rho=densidad)
+real inOutVelocity=1;
+
+macro grad(u) [dx(u), dy(u)] // fin de macro
+macro div(u,v) (dx(u)+dy(v)) // fin de macro
+
+real dt = 0.01;
+
+problem stokes2d( [u,v,p], [uu,vv,pp],
+		  solver=LU // Ejemplo de selección de "solver"
+		  ) =
+  int2d(Th)(
+	    nu*grad(u)'*grad(uu) + nu*grad(v)'*grad(vv)
+	    - p*div(uu,vv) + pp*div(u,v)
+	    + 1e-12*p*pp // Penalización de la presión ( => unicidad de solución)
+	    )
+  + on(paredes, v=0)  // Velocidad vertical nula en la frontera de tipo "pared"
+  + on(paredIzq,u=inOutVelocity) // V. horizontal dada en pared izquierda
+  + on(cilindro, u=0, v=0);  // En la frontera del cilindro
+
+stokes2d;
+
+// Vorticity
+vort = dy(u) - dx(v);
+
+plot(Th, [u,v], fill=1, wait=1);
+plot(Th, p, fill=1, value=1);
+plot(Th, vort, fill=1, value=1, wait=1);
+
+// Save to VTK (for high quality plotting)
+load "iovtk";
+savevtk("stokes-drag-cylinder.vtk", Th, [u,v,0], p, vort,
+	dataname="Velocity Pressure Vorticity");
