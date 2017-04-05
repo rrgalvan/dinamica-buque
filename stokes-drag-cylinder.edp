@@ -1,44 +1,80 @@
-// Problema de Stokes estacionario 2D
+// Problema de Stokes estacionario 2D:
 //
-// * Dominio rectangular con un agujero
+// - nu*( dxx(u) + dyy(u) ) + dx(p) = 0
+// - nu*( dxx(v) + dyy(v) ) + dy(p) = 0
+//   dx(u) + dy(v) = 0
+//   + condiciones_de_contorno
+//
+// donde dx=derivada parcial respecto a x, dxx = derivada segunda respecto a x, etc.
+//
+// La variable nu es la viscosidad cinemática (nu=mu/rho, donde mu es la viscosidad dinámica
+// y rho es la densidad) y la variable p está dividida por rho (la presión original es rho*p).
+//
+// Dominio geométrico y condiciones de contorno:
+//
+// * Dominio rectangular con un agujero circular
 // * Cálculo de la vorticidad y almacenamiento en un fichero VTK
 //   (para su posterior visualización con VTK)
+// * Condiciones de contorno: u=v=0 en la circunferencia, v=0 en toda la frontera,
+//   u es un valor dado en la pared izquierda, grad(u)*n=0 en el resto de las
+//   paredes.
 
-// Rectángulo exterior
-real xcoor = 15, ycoor = 5;
+// Datos físicos
 
+real inVelocity=1; // Velocidad de entrada del fluido
+
+real rho=998.2; // Densidad del agua (en g/m^3) a 20 grados C.
+real mu=1.102e-3; // Viscosidad dinámica del agua (en N*s/m^2) a 20 grados C.
+real nu=mu/rho; // Viscodidad cinemática del agua (en m^2/s)
+
+real V=inVelocity; // Velocidad característica
+real L=1; // Longitud característica
+real Re=V*L/nu; // Número de Reynodlds
+
+
+cout << "==================================================================" << endl;
+cout << "Ejecutando experimento con:  Re=" << Re
+     << "  (V=" << V << ", L=" << L << ", nu=" << nu << ")" << endl;
+cout << "==================================================================" << endl;
+
+
+// Rectángulo exterior (por ejemplo, en metros).
+real xcoor = 15*L, ycoor = 5*L;
+
+// Etiquetas para definir las fronteras del dominio
 int paredInf=1, paredSup=3, paredDer=2, paredIzq=4;
 int[int] paredes = [paredInf, paredSup, paredDer, paredIzq];
 int cilindro=0;
 
+// Definición de las paredes
 border lx1(k=-xcoor,xcoor) { x=k; y=-ycoor; label=paredInf; }
 border lx2(k=-xcoor,xcoor) { x=k; y=+ycoor; label=paredSup; }
-border ly1(k=-ycoor,ycoor) { x=-xcoor; y=k; label=paredDer; }
-border ly2(k=-ycoor,ycoor) { x=+xcoor; y=k; label=paredIzq; }
+border ly1(k=-ycoor,ycoor) { x=-xcoor; y=k; label=paredIzq; }
+border ly2(k=-ycoor,ycoor) { x=+xcoor; y=k; label=paredDer; }
 
-real R=1.5;
+// Definición del círculo
+real R=1.5*L;
 border c(k=0,2*pi) { x=R*cos(k); y=R*sin(k); label=cilindro; }
 
+// Construcción de la malla
 int nx=40, ny=15, nc=15;
-mesh Th = buildmesh( ly1(-ny)+lx1(nx)+ly2(ny)+lx2(-nx)
-     + c(-nc) );
+mesh Th = buildmesh( ly1(-ny)+lx1(nx)+ly2(ny)+lx2(-nx) + c(-nc) );
 
+// Defnición de espacios y funciones de elementos finitos
 fespace Uh(Th,P2); // Espacio para velocidades
 fespace Ph(Th,P1); // Espacio para presiones
-Uh u,v,uu,vv;
-Ph p,pp;
-Ph vort; // Vorticidad
+fespace VortSpace(Th,P1); // Espacio donde calcular la vorticidad
 
-real nu=1; // Viscodidad cinemática (=mu/rho, con mu=visc. dinámica y rho=densidad)
-real inOutVelocity=1;
+Uh u,v,uu,vv; // Incógnitas u,v y funciones test uu,vv
+Ph p,pp; // Presión y función test,
+VortSpace vort; // Vorticidad
+
 
 macro grad(u) [dx(u), dy(u)] // fin de macro
 macro div(u,v) (dx(u)+dy(v)) // fin de macro
 
-real dt = 0.01;
-
-problem stokes2d( [u,v,p], [uu,vv,pp],
-		  solver=LU // Ejemplo de selección de "solver"
+problem stokes2d( [u,v,p], [uu,vv,pp]
+		  // , solver=LU // Ejemplo de selección de "solver"
 		  ) =
   int2d(Th)(
 	    nu*grad(u)'*grad(uu) + nu*grad(v)'*grad(vv)
@@ -46,16 +82,20 @@ problem stokes2d( [u,v,p], [uu,vv,pp],
 	    + 1e-12*p*pp // Penalización de la presión ( => unicidad de solución)
 	    )
   + on(paredes, v=0)  // Velocidad vertical nula en la frontera de tipo "pared"
-  + on(paredIzq,u=inOutVelocity) // V. horizontal dada en pared izquierda
+  + on(paredIzq,u=inVelocity) // V. horizontal dada en pared izquierda
   + on(cilindro, u=0, v=0);  // En la frontera del cilindro
 
 stokes2d;
 
+// Re-escalo la presión (en las ecuaciones, se dividió por rho)
+
+p=rho*p;
+
 // Vorticity
 vort = dy(u) - dx(v);
 
-plot(Th, [u,v], fill=1, wait=1);
-plot(Th, p, fill=1, value=1);
+plot(Th, [u,v], fill=1, value=1, wait=1);
+plot(Th, p, fill=1, value=1, wait=1);
 plot(Th, vort, fill=1, value=1, wait=1);
 
 // Save to VTK (for high quality plotting)
