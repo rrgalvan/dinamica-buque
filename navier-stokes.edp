@@ -106,6 +106,8 @@ problem stokesEvolutivo2d( [u,v,p], [uu,vv,pp]
   // Forma bilineal ("primer miembro")
   int2d(Th)(
 	    u*uu/dt + v*vv/dt
+	    + u0*dx(u)*uu + v0*dy(u)*uu
+	    + u0*dx(v)*vv + v0*dy(v)*vv
 	    + nu*grad(u)'*grad(uu) + nu*grad(v)'*grad(vv)
 	    - p*div(uu,vv) + pp*div(u,v)
 	    + 1e-12 * p*pp // Penalización de la presión ( => unicidad de solución)
