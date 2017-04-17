@@ -34,9 +34,9 @@ real nu=mu/rho; // Viscodidad cinemática del agua (en m^2/s)
 real pInf=0; // Presión de referencia
 
 // Parámetros del sistema
-real inVelocity=1; // Velocidad de entrada del fluido (por ejemplo, m/s)
+real magnitudVeloc=1; // Magnitud de la velocidad de entrada del fluido (por ejemplo, m/s)
 real L=1; // Longitud característica (por ejemplo, en metros).
-real V=inVelocity; // Velocidad característica
+real V=magnitudVeloc; // Velocidad característica
 real Re=V*L/nu; // Número de Reynodlds
 
 cout << "=======================================================================" << endl;
@@ -83,8 +83,13 @@ real dt=(T1-T0)/niter; // Paso de tiempo
 real frec = 1.0/dt; // Frecuencia
 int  iter; // Contador de iteraciones
 real t; // Instante actual
+
 func uInicial = 0; // Condición Inicial para u
 func vInicial = 0; // Condición Inicial para v
+// Condición de contorno de entrada
+func real inVelocity(real x, real y, real t) {
+  return magnitudVeloc * t/(T1-T0);
+}
 
 u0=uInicial; // Inicializamos u
 v0=vInicial; // ... y v
@@ -108,7 +113,7 @@ problem stokesEvolutivo2d( [u,v,p], [uu,vv,pp]
 	     u0*uu/dt + v0*vv/dt
 	     )
   + on(paredes, v=0)  // Velocidad vertical nula en la frontera de tipo "pared"
-  + on(paredIzq,u=inVelocity) // V. horizontal dada en pared izquierda
+  + on(paredIzq,u=inVelocity(x,y,t) ) // V. horizontal dada en pared izquierda
   + on(cilindro, u=0, v=0);  // En la frontera del cilindro
 
 //
