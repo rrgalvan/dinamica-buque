@@ -1,9 +1,10 @@
-// Problema de Stokes estacionario 2D:
+// Problema de Stokes evolutivo 2D:
 //
-// - nu*( dxx(u) + dyy(u) ) + dx(p) = 0
-// - nu*( dxx(v) + dyy(v) ) + dy(p) = 0
-//   dx(u) + dy(v) = 0
+// dt(u) - nu*( dxx(u) + dyy(u) ) + dx(p) = 0
+// dt(u) - nu*( dxx(v) + dyy(v) ) + dy(p) = 0
+//         dx(u) + dy(v) = 0
 //   + condiciones_de_contorno
+//   + condicion_inicial
 //
 // donde dx=derivada parcial respecto a x, dxx = derivada segunda respecto a x, etc.
 //
@@ -22,6 +23,9 @@
 // * Condiciones de contorno: u=v=0 en la circunferencia, v=0 en toda la frontera,
 //   u es un valor dado en la pared izquierda, grad(u)*n=0 en el resto de las
 //   paredes.
+//
+// Esquema en tiempo Euler implícito: si t^m = m*dt (m=0,1,...),
+//   dt(u(t^{m+1}) ~= (u^{m+1}-u^m) / dt
 
 // Datos físicos
 real rho=998.2; // Densidad del agua (en kg/m^3) a 20 grados C.
@@ -66,46 +70,88 @@ mesh Th = buildmesh( ly1(-ny)+lx1(nx)+ly2(ny)+lx2(-nx) + c(-nc) );
 fespace Vh(Th,P2); // Espacio para velocidades
 fespace Qh(Th,P1); // Espacio para presiones
 Vh u,v,uu,vv; // Incógnitas u,v y funciones test uu,vv
-Qh p,pp; // Presión y función test,
+Vh u0,v0; // Solución (campo de velocidades) en la etapa anterior
+Qh p,pp; // Presión y función test
 
 fespace VortSpace(Th,P1); // Espacio donde calcular la vorticidad
 VortSpace vort; // Variable para calcular la vorticidad
 
+// Esquema en tiempo
+real T0=0, T1=1; // Intervalo de tiempo [T0,T1]
+int niter=20; // Número de iteraciones en tiempo
+real dt=(T1-T0)/niter; // Paso de tiempo
+real frec = 1.0/dt; // Frecuencia
+int  iter; // Contador de iteraciones
+real t; // Instante actual
+func uInicial = 0; // Condición Inicial para u
+func vInicial = 0; // Condición Inicial para v
+
+u0=uInicial; // Inicializamos u
+v0=vInicial; // ... y v
+
+//
+// Definición del problema variacionl
+//
 macro grad(u) [dx(u), dy(u)] // fin de macro
 macro div(u,v) (dx(u)+dy(v)) // fin de macro
 
-problem stokes2d( [u,v,p], [uu,vv,pp]
+problem stokesEvolutivo2d( [u,v,p], [uu,vv,pp]
 		  // , solver=LU // Ejemplo de selección de "solver"
 		  ) =
   int2d(Th)(
-	    nu*grad(u)'*grad(uu) + nu*grad(v)'*grad(vv)
+	    u*uu/dt + v*vv/dt
+	    + nu*grad(u)'*grad(uu) + nu*grad(v)'*grad(vv)
 	    - p*div(uu,vv) + pp*div(u,v)
 	    + 1e-12 * p*pp // Penalización de la presión ( => unicidad de solución)
 	    )
+  -int2d(Th)(
+	     u0*uu/dt + v0*vv/dt
+	     )
   + on(paredes, v=0)  // Velocidad vertical nula en la frontera de tipo "pared"
   + on(paredIzq,u=inVelocity) // V. horizontal dada en pared izquierda
   + on(cilindro, u=0, v=0);  // En la frontera del cilindro
 
-stokes2d; // Resolución del problema de Stokes
+//
+// Bucle de iteraciones en tiempo
+//
+for(iter=0; iter<niter; iter++)
+  {
+    t = T0 + (iter+1)*dt;
+    cout << "Iterac. " << iter << ", t=" << t << endl;
 
-p=p*rho; // Re-escalo la presión (en las ecuaciones, se dividió por rho)
-p=p+pInf; // ... y sumo presión de referencia
+    //
+    // Resolvemos el prolema en la etapa de tiempo actual
+    //
+    stokesEvolutivo2d;
 
-cout << "Valor min/max para p: " << p[].min  << "/"
-     << p[].max << endl;
+    //
+    // Ajustamos la presión
+    //
+    p=p*rho; // Re-escalo la presión (en las ecuaciones, se dividió por rho)
+    p=p+pInf; // ... y sumo presión de referencia
 
-real arrastre = int2d(Th,cilindro)(p);
-cout << "Arrastre:" << arrastre << endl;
-cout << "Previsto:" << 3*pi*mu*V*2*R << endl;
+    //
+    // Calculamos la vorticidad
+    //
+    vort = dy(u) - dx(v);
 
-// Vorticity
-vort = dy(u) - dx(v);
+    //
+    // Preparamos la siguiente iteración
+    //
+    u0=u;
+    v0=v;
 
-plot(Th, [u,v], value=1, wait=1);
-plot(Th, p, fill=1, value=1, wait=1);
-plot(Th, vort, fill=1, value=1, wait=1);
+    //
+    // Pintamos algunas gráficas
+    //
+    plot(Th, [u,v], value=1, wait=1);
+    plot(Th, p, fill=1, value=1, wait=1);
+    plot(Th, vort, fill=1, value=1, wait=1);
+    // Save to VTK (for high quality plotting)
+    load "iovtk";
+    string filename = "stokes-evolution-iter" + iter + ".vtk";
+    savevtk(filename, Th, [u,v,0], p, vort,
+	    dataname="Velocity Pressure Vorticity");
 
-// Save to VTK (for high quality plotting)
-load "iovtk";
-savevtk("stokes-drag-cylinder.vtk", Th, [u,v,0], p, vort,
-	dataname="Velocity Pressure Vorticity");
+
+  }
