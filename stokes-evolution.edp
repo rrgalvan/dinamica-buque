@@ -77,8 +77,8 @@ fespace VortSpace(Th,P1); // Espacio donde calcular la vorticidad
 VortSpace vort; // Variable para calcular la vorticidad
 
 // Esquema en tiempo
-real T0=0, T1=1; // Intervalo de tiempo [T0,T1]
-int niter=20; // Número de iteraciones en tiempo
+real T0=0, T1=10; // Intervalo de tiempo [T0,T1]
+int niter=100; // Número de iteraciones en tiempo
 real dt=(T1-T0)/niter; // Paso de tiempo
 real frec = 1.0/dt; // Frecuencia
 int  iter; // Contador de iteraciones
@@ -155,7 +155,7 @@ for(iter=0; iter<niter; iter++)
     plot(Th, [u,v], value=1, wait=1);
     plot(Th, p, fill=1, value=1, wait=1);
     plot(Th, vort, fill=1, value=1, wait=1);
-    // Save to VTK (for high quality plotting)
+    // Save to VTK (for high quality plottin)
     load "iovtk";
     string filename = "stokes-evolution-iter" + iter + ".vtk";
     savevtk(filename, Th, [u,v,0], p, vort,

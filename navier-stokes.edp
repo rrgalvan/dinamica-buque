@@ -88,17 +88,25 @@ func uInicial = 0; // Condición Inicial para u
 func vInicial = 0; // Condición Inicial para v
 // Condición de contorno de entrada
 func real inVelocity(real x, real y, real t) {
-  return magnitudVeloc * t/(T1-T0);
+  return magnitudVeloc;
 }
 
-u0=uInicial; // Inicializamos u
-v0=vInicial; // ... y v
-
-//
 // Definición del problema variacionl
 //
 macro grad(u) [dx(u), dy(u)] // fin de macro
 macro div(u,v) (dx(u)+dy(v)) // fin de macro
+
+problem stokes2d( [u,v,p], [uu,vv,pp]
+		  // , solver=LU // Ejemplo de selección de "solver"
+		  ) =
+  int2d(Th)(
+	    nu*grad(u)'*grad(uu) + nu*grad(v)'*grad(vv)
+	    - p*div(uu,vv) + pp*div(u,v)
+	    + 1e-12 * p*pp // Penalización de la presión ( => unicidad de solución)
+	    )
+  + on(paredes, v=0)  // Velocidad vertical nula en la frontera de tipo "pared"
+  + on(paredIzq, u=inVelocity(x,y,T0) ) // V. horizontal dada en pared izquierda
+  + on(cilindro, u=0, v=0);  // En la frontera del cilindro
 
 problem stokesEvolutivo2d( [u,v,p], [uu,vv,pp]
 		  // , solver=LU // Ejemplo de selección de "solver"
@@ -120,6 +128,11 @@ problem stokesEvolutivo2d( [u,v,p], [uu,vv,pp]
   + on(paredes, v=0)  // Velocidad vertical nula en la frontera de tipo "pared"
   + on(paredIzq,u=inVelocity(x,y,t) ) // V. horizontal dada en pared izquierda
   + on(cilindro, u=0, v=0);  // En la frontera del cilindro
+
+stokes2d;
+
+u0=u;
+v0=v;
 
 //
 // Bucle de iteraciones en tiempo
