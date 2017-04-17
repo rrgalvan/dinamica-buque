@@ -114,16 +114,16 @@ problem stokesEvolutivo2d( [u,v,p], [uu,vv,pp]
   // Forma bilineal ("primer miembro")
   int2d(Th)(
 	    u*uu/dt + v*vv/dt
- 	    // - int2d(Th)(convect([u0,v0], -dt, u0)*uu/dt)
- 	    // - int2d(Th)(convect([u0,v0], -dt, v0)*vv/dt)
-	    + u0*dx(u)*uu + v0*dy(u)*uu 
-            + u0*dx(v)*vv + v0*dy(v)*vv
+ 	    - convect([u0,v0], -dt, u0)*uu/dt
+ 	    - convect([u0,v0], -dt, v0)*vv/dt
+	    // + u0*dx(u)*uu + v0*dy(u)*uu 
+            // + u0*dx(v)*vv + v0*dy(v)*vv
 	    + nu*grad(u)'*grad(uu) + nu*grad(v)'*grad(vv)
 	    - p*div(uu,vv) + pp*div(u,v)
-	 - int1d(Th, paredIzq) (nu*dx(u)*N.x*uu+nu*dy(u)*N.y*uu)
- 	 - int1d(Th, paredIzq) (nu*dx(v)*N.x*vv+nu*dy(v)*N.y*vv)
 	    + 1e-12 * p*pp // Penalización de la presión ( => unicidad de solución)
 	    )
+	  - int1d(Th, paredIzq) (nu*dx(u)*N.x*uu+nu*dy(u)*N.y*uu)
+ 	  - int1d(Th, paredIzq) (nu*dx(v)*N.x*vv+nu*dy(v)*N.y*vv)
   // Forma lineal ("segundo miembro")
   -int2d(Th)(
 	     u0*uu/dt + v0*vv/dt
