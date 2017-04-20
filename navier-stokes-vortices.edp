@@ -88,7 +88,7 @@ func uInicial = 0; // Condición Inicial para u
 func vInicial = 0; // Condición Inicial para v
 // Condición de contorno de entrada
 func real inVelocity(real x, real y, real t) {
-  return magnitudVeloc * t/(T1-T0);
+  return magnitudVeloc * (t-T0)/(T1-T0);
 }
 
 u0=uInicial; // Inicializamos u
