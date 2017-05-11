@@ -34,7 +34,7 @@ real nu=mu/rho; // Viscodidad cinemática del agua (en m^2/s)
 real pInf=0; // Presión de referencia
 
 // Parámetros del sistema
-real magnitudVeloc=1; // Magnitud de la velocidad de entrada del fluido (por ejemplo, m/s)
+real magnitudVeloc=0.1; // Magnitud de la velocidad de entrada del fluido (por ejemplo, m/s)
 real L=1; // Longitud característica (por ejemplo, en metros).
 real V=magnitudVeloc; // Velocidad característica
 real Re=V*L/nu; // Número de Reynodlds
@@ -45,12 +45,14 @@ cout << "Ejecutando experimento con:  Re=" << Re
 cout << "=======================================================================" << endl;
 
 // Coordenadas para definir el rectángulo exterior
-real xcoor = 15*L, ycoor = 5*L;
+// real xcoor = 15*L, ycoor = 5*L;
+real xcoor = 6*L, ycoor = 3*L;
+real xcoor2 = 1.5*L, ycoor2=1.5*L;
 
 // Etiquetas para definir las fronteras del dominio
 int paredInf=1, paredSup=3, paredDer=2, paredIzq=4;
 int[int] paredes = [paredInf, paredSup, paredDer, paredIzq];
-int cilindro=0;
+int bordeInterior=0;
 
 // Definición de las paredes
 border lx1(k=-xcoor,xcoor) { x=k; y=-ycoor; label=paredInf; }
@@ -58,13 +60,26 @@ border lx2(k=-xcoor,xcoor) { x=k; y=+ycoor; label=paredSup; }
 border ly1(k=-ycoor,ycoor) { x=-xcoor; y=k; label=paredIzq; }
 border ly2(k=-ycoor,ycoor) { x=+xcoor; y=k; label=paredDer; }
 
-// Definición del círculo
-real R=1.5*L;
-border c(k=0,2*pi) { x=R*cos(k); y=R*sin(k); label=cilindro; }
+// Definición del perfil naca
+border nacaMas(t=0,1){
+  x = t;
+  y = 0.17735*sqrt(t)-0.075597*t
+    - 0.212836*(t^2)+0.17363*(t^3)-0.06254*(t^4);
+  label=bordeInterior; }
+border nacaMenos(t=1,0){
+  x =t;
+  y= -(0.17735*sqrt(t)-0.075597*t
+       -0.212836*(t^2)+0.17363*(t^3)-0.06254*(t^4));
+  label=bordeInterior; }
+
 
 // Construcción de la malla
-int nx=40, ny=12, nc=25;
-mesh Th = buildmesh( ly1(-ny)+lx1(nx)+ly2(ny)+lx2(-nx) + c(-nc) );
+int nx=30, ny=10, nc=30;
+// mesh Th = buildmesh( ly1(-ny)+lx1(nx)+ly2(ny)+lx2(-nx) + c(-nc) );
+mesh Th = buildmesh( ly1(-ny)+lx1(nx)+ly2(ny)+lx2(-nx)
+		     + nacaMas(nc) + nacaMenos(nc) );
+
+plot(Th,wait=1);
 
 // Defnición de espacios y funciones de elementos finitos
 fespace Vh(Th,P2); // Espacio para velocidades
@@ -77,8 +92,8 @@ fespace VortSpace(Th,P1); // Espacio donde calcular la vorticidad
 VortSpace vort; // Variable para calcular la vorticidad
 
 // Esquema en tiempo
-real T0=0, T1=10; // Intervalo de tiempo [T0,T1]
-int niter=100; // Número de iteraciones en tiempo
+real T0=0, T1=2000; // Intervalo de tiempo [T0,T1]
+int niter=200; // Número de iteraciones en tiempo
 real dt=(T1-T0)/niter; // Paso de tiempo
 real frec = 1.0/dt; // Frecuencia
 int  iter; // Contador de iteraciones
@@ -91,52 +106,35 @@ func real inVelocity(real x, real y, real t) {
   return magnitudVeloc;
 }
 
+u0=uInicial; // Inicializamos u
+v0=vInicial; // ... y v
+
+//
 // Definición del problema variacionl
 //
 macro grad(u) [dx(u), dy(u)] // fin de macro
 macro div(u,v) (dx(u)+dy(v)) // fin de macro
 
-problem stokes2d( [u,v,p], [uu,vv,pp]
-		  // , solver=LU // Ejemplo de selección de "solver"
-		  ) =
-  int2d(Th)(
-	    nu*grad(u)'*grad(uu) + nu*grad(v)'*grad(vv)
-	    - p*div(uu,vv) + pp*div(u,v)
-	    + 1e-12 * p*pp // Penalización de la presión ( => unicidad de solución)
-	    )
-  + on(paredes, v=0)  // Velocidad vertical nula en la frontera de tipo "pared"
-  + on(paredIzq, u=inVelocity(x,y,T0) ) // V. horizontal dada en pared izquierda
-  + on(cilindro, u=0, v=0);  // En la frontera del cilindro
-
-problem stokesEvolutivo2d( [u,v,p], [uu,vv,pp]
+problem navierStokes2d( [u,v,p], [uu,vv,pp]
 		  // , solver=LU // Ejemplo de selección de "solver"
 		  ) =
   // Forma bilineal ("primer miembro")
   int2d(Th)(
 	    u*uu/dt + v*vv/dt
- 	    - convect([u0,v0], -dt, u0)*uu/dt
- 	    - convect([u0,v0], -dt, v0)*vv/dt
-	    // + u0*dx(u)*uu + v0*dy(u)*uu 
-            // + u0*dx(v)*vv + v0*dy(v)*vv
 	    + nu*grad(u)'*grad(uu) + nu*grad(v)'*grad(vv)
 	    - p*div(uu,vv) + pp*div(u,v)
 	    + 1e-12 * p*pp // Penalización de la presión ( => unicidad de solución)
 	    )
-	  - int1d(Th, paredIzq) (nu*dx(u)*N.x*uu+nu*dy(u)*N.y*uu)
- 	  - int1d(Th, paredIzq) (nu*dx(v)*N.x*vv+nu*dy(v)*N.y*vv)
   // Forma lineal ("segundo miembro")
   -int2d(Th)(
-	     u0*uu/dt + v0*vv/dt
+	     // u0*uu/dt + v0*vv/dt
+	     convect([u0,v0], -dt, u0)*uu/dt
+	     + convect([u0,v0], -dt, v0)*vv/dt
 	     )
   // Condiciones de contorno Dirichlet
   + on(paredes, v=0)  // Velocidad vertical nula en la frontera de tipo "pared"
   + on(paredIzq,u=inVelocity(x,y,t) ) // V. horizontal dada en pared izquierda
-  + on(cilindro, u=0, v=0);  // En la frontera del cilindro
-
-stokes2d;
-
-u0=u;
-v0=v;
+  + on(bordeInterior, u=0, v=0);  // En la frontera del cilindro
 
 //
 // Bucle de iteraciones en tiempo
@@ -149,7 +147,10 @@ for(iter=0; iter<niter; iter++)
     //
     // Resolvemos el prolema en la etapa de tiempo actual
     //
-    stokesEvolutivo2d;
+    navierStokes2d;
+
+    // Adaptar la malla, según la magnitud el campo de velociadades
+    Th = adaptmesh(Th, [u,v], hmin=5./100);
 
     //
     // Ajustamos la presión
@@ -171,12 +172,12 @@ for(iter=0; iter<niter; iter++)
     //
     // Pintamos algunas gráficas
     //
-    plot(Th, [u,v], value=1, wait=1);
-    plot(Th, p, fill=1, value=1, wait=1);
-    plot(Th, vort, fill=1, value=1, wait=1);
-    // Save to VTK (for high quality plotting)
+    plot(Th, [u,v], value=1);
+    // plot(Th, p, fill=1, value=1);
+    // plot(Th, vort, fill=1, value=1);
+    // Save to VTK (for high quality plottin)
     load "iovtk";
-    string filename = "stokes-evolution-iter" + iter + ".vtk";
+    string filename = "navier-stokes-naca-iter" + iter + ".vtk";
     savevtk(filename, Th, [u,v,0], p, vort,
 	    dataname="Velocity Pressure Vorticity");
 

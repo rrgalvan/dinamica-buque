@@ -41,7 +41,9 @@ cout << "Ejecutando experimento con:  Re=" << Re
 cout << "=======================================================================" << endl;
 
 // Coordenadas para definir el rectángulo exterior
-real xcoor = 15*L, ycoor = 5*L;
+// real xcoor = 15*L, ycoor = 5*L;
+real xcoor = 50*L, ycoor = 15*L;
+real xcoor2 = 1.5*L, ycoor2=1.5*L;
 
 // Etiquetas para definir las fronteras del dominio
 int paredInf=1, paredSup=3, paredDer=2, paredIzq=4;
@@ -56,11 +58,19 @@ border ly2(k=-ycoor,ycoor) { x=+xcoor; y=k; label=paredDer; }
 
 // Definición del círculo
 real R=1.5*L;
-border c(k=0,2*pi) { x=R*cos(k); y=R*sin(k); label=cilindro; }
+// border c(k=0,2*pi) { x=R*cos(k); y=R*sin(k); label=cilindro; }
+border c1(k=-xcoor2,xcoor2) { x=k; y=-ycoor2; label=cilindro; }
+border c2(k=-ycoor2,ycoor2) { x=+xcoor2; y=k; label=cilindro; }
+border c3(k=-xcoor2,xcoor2) { x=k; y=+ycoor2; label=cilindro; }
+border c4(k=-ycoor2,ycoor2) { x=-xcoor2; y=k; label=cilindro; }
 
 // Construcción de la malla
 int nx=40, ny=12, nc=25;
-mesh Th = buildmesh( ly1(-ny)+lx1(nx)+ly2(ny)+lx2(-nx) + c(-nc) );
+// mesh Th = buildmesh( ly1(-ny)+lx1(nx)+ly2(ny)+lx2(-nx) + c(-nc) );
+mesh Th = buildmesh( ly1(-ny)+lx1(nx)+ly2(ny)+lx2(-nx)
+		     + c1(-nc) + c2(-nc) + c3(nc) + c4(nc) );
+
+plot(Th,wait=1);
 
 // Defnición de espacios y funciones de elementos finitos
 fespace Vh(Th,P2); // Espacio para velocidades
@@ -94,29 +104,8 @@ p=p+pInf; // ... y sumo presión de referencia
 cout << "Valor min/max para p: " << p[].min  << "/"
      << p[].max << endl;
 
-// Fuerza de arrastre (apuntes P. López, D. Buque, 2017):
-//   F_i = \int_{superficie} \sigma_{ij}  d A_j,
-// donde \sigma_{ij} es el tensor de esfuerzos:
-//   \sigma_{ij} = -p \delta_{ij} + \tau_{ij}.
-// Fluido Newtoniano si y sólo si
-//   \tau_{ij} = 2\mu e_{ij},
-// donde e_{ij} = velocidad de deformación:
-//   e_{ij} = 1./2 ( \partial u_i / \partial x_j + \partial u_j / \partial x_i ).
-// Luego
-//   \sigma_{ij} = -p \delta_{ij}
-//           + \mu ( \partial u_i / \partial x_j + \partial u_j / \partial x_i ).
-
-// Fuerza debida a la presión
-real fP = -int1d(Th, cilindro)(p);
-// Fuerzas debidas al tensor de esfuerzos (dos componentes)
-real fTau1 = mu*int1d(Th, cilindro)(2*dx(u)*N.x + (dy(u)+dx(v))*N.y);
-real fTau2 = mu*int1d(Th, cilindro)((dy(u)+dx(v))*N.x + 2*dy(v)*N.y);
-
-cout << "Fuerza debida a la presi'on (m'odulo):" << abs(fP) << endl;
-cout << "Fuerza debida a esfuerzos (m'odulo):" << sqrt(fTau1^2+fTau2^2) << endl;
-// cout << "Arrastre:" << arrastre << endl;
-cout << "Previsto:" << 3*pi*mu*V*2*R << endl;
-
+real arrastre = int1d(Th,cilindro)(p);
+cout << "Arrastre:" << arrastre << endl;
 
 // Vorticity
 vort = dy(u) - dx(v);
@@ -125,7 +114,10 @@ plot(Th, [u,v], value=1, wait=1);
 plot(Th, p, fill=1, value=1, wait=1);
 plot(Th, vort, fill=1, value=1, wait=1);
 
+// Calcular fuerza de arrastre
+
+
 // Save to VTK (for high quality plotting)
 load "iovtk";
-savevtk("stokes-drag-cylinder.vtk", Th, [u,v,0], p, vort,
+savevtk("stokes-drag-square.vtk", Th, [u,v,0], p, vort,
 	dataname="Velocity Pressure Vorticity");

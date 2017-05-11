@@ -35,7 +35,7 @@ real pInf=0; // Presión de referencia
 
 // Parámetros del sistema
 real magnitudVeloc=0.1; // Magnitud de la velocidad de entrada del fluido (por ejemplo, m/s)
-real L=0.1; // Longitud característica (por ejemplo, en metros).
+real L=1; // Longitud característica (por ejemplo, en metros).
 real V=magnitudVeloc; // Velocidad característica
 real Re=V*L/nu; // Número de Reynodlds
 
@@ -77,7 +77,7 @@ fespace VortSpace(Th,P1); // Espacio donde calcular la vorticidad
 VortSpace vort; // Variable para calcular la vorticidad
 
 // Esquema en tiempo
-real T0=0, T1=200; // Intervalo de tiempo [T0,T1]
+real T0=0, T1=1000; // Intervalo de tiempo [T0,T1]
 int niter=200; // Número de iteraciones en tiempo
 real dt=(T1-T0)/niter; // Paso de tiempo
 real frec = 1.0/dt; // Frecuencia
@@ -159,7 +159,7 @@ for(iter=0; iter<niter; iter++)
     // plot(Th, vort, fill=1, value=1);
     // Save to VTK (for high quality plottin)
     load "iovtk";
-    string filename = "stokes-evolution-iter" + iter + ".vtk";
+    string filename = "navier-stokes-cylinder-iter" + iter + ".vtk";
     savevtk(filename, Th, [u,v,0], p, vort,
 	    dataname="Velocity Pressure Vorticity");
 
