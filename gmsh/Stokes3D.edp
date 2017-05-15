@@ -1,0 +1,45 @@
+// De http://www.um.es/freefem/ff++/pmwiki.php?n=Main.GMSH3D
+load "gmsh"
+load "tetgen"
+load "iovtk"
+verbosity = 1;
+
+mesh3 Th1 = gmshload3("Stokes3DDominio.msh");
+
+int caraSuperior=30, carasRestantes=31;
+
+// savemesh(Th1,"Th33.mesh");
+
+//
+// Transform to FreeFem++ format
+//
+mesh3 Th = tetg(Th1,switch="pqaAAYYQ");// discrétisation de la salle et des racks
+
+
+fespace Xh( Th, P1b );
+fespace Ph( Th, P1 );
+
+Xh u1, u2, u3, v1, v2, v3;
+Ph p, q;
+
+real nu = 0.1;
+func f1 = 0.;
+func f2 = 0.;
+func f3 = 0.;
+func g = 16*x*(1-x)*y*(1-y); //x * y;
+
+macro grad( u )[ dx( u ), dy( u ), dz( u ) ] // Fin de macro
+
+macro div( u1, u2, u3 )( dx( u1 ) + dy( u2 ) + dz( u3 ) ) // Fin de macro
+
+solve Stokes( [ u1, u2, u3, p ], [ v1, v2, v3, q ] ) =
+	int3d( Th )( nu * ( grad( u1 )' * grad( v1 ) + grad( u2 )' * grad( v2 ) + grad( u3 )' * grad( v3 ) ) )
+	- int3d( Th )( div( v1, v2, v3 ) * p )
+	- int3d( Th ) ( ( div( u1, u2, u3 ) - 1e-10 * p ) * q )
+	- int3d( Th )( f1 * v1 + f2 * v2 + f3 * v3 )
+	+ on( carasRestantes, u1 = 0, u2 = 0, u3 = 0 )
+        + on( caraSuperior, u1 = g, u2 = 0, u3 = 0 );
+
+// plot( [ u1, u2, u3 ], value = true, wait = true );
+
+savevtk( "/tmp/Stokes3d.vtk", Th, [ u1, u2, u3 ], p, dataname = "Velocidad Presi'on" );
