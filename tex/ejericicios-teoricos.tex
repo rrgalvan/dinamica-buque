@@ -1,0 +1,98 @@
+\documentclass{article}
+
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+% \usepackage[T1]{fontenc}
+\usepackage[margin={2cm,1.5cm}]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\newcommand{\Rset}{\mathbb{R}}
+\newcommand{\uu}{\vec{\mathbf{u}}}
+\newcommand{\ff}{\vec{\mathbf{f}}}
+\newcommand{\dt}[1]{\frac{\partial #1}{\partial t}}
+\newcommand{\dx}[1]{\frac{\partial #1}{\partial x}}
+\newcommand{\dy}[1]{\frac{\partial #1}{\partial x}}
+\newcommand{\laplace}{\nabla^2}
+\newcommand{\grad}{\vec{\mathbf{\nabla}}}
+\renewcommand{\div}{\nabla\cdot}
+
+\begin{document}
+\begin{titlepage}
+  \begin{center}
+    Dinámica del Buque (CFD) \hfill Máster en Ingeniería Naval \hfill
+    Curso 2016/17
+    \\[2em]
+    {\LARGE Ejercicios Teóricos}
+\end{center}
+
+\bigskip
+
+\begin{enumerate}
+\item Sea $\Omega\subset \Rset^2$ el dominio comprendido entre un
+  círculo $C$ y un sólido contenido en $C$ con superficie
+  $S$. Consideremos un flujo potencial
+  $$
+  \uu(x,y)=
+  \left(
+    \begin{array}{r}
+      \dy{\psi(x,y)} \\ [0.5em]
+      -\dx{\psi(x,y)}
+    \end{array}
+  \right),
+  $$
+  donde $\psi$ es solución de:
+  \begin{equation*}
+   \left\{
+     \begin{aligned}
+       -\laplace\psi &=0 \quad \text{en } \Omega ,\\
+       \psi|_S &=0, \quad \psi|_C= y.
+     \end{aligned}
+   \right.
+ \end{equation*}
+ Determinar la correspondiente formulación variacional.
+
+\item %% 2
+  Determinar la formulación variacional (mixta) para el problema de
+  Stokes estacionario: hallar $\uu:\Omega \to \Rset^2$ y
+  $p:\Omega\to\Rset$ tales que
+  \begin{equation*}
+   \left\{
+     \begin{aligned}
+       -\nu\laplace\uu + \grad p &= \ff \quad \text{en } \Omega ,\\
+       \div\uu &=0 \quad\text{en } \Omega,\\
+       \uu &=0 \quad\text{sobre } \partial\Omega,\\
+     \end{aligned}
+   \right.
+ \end{equation*}
+ donde $\Omega\subset\Rset^2$, $\nu\in\Rset$, $\nu>0$,
+ $\ff:\Omega \to \Rset^2$ son datos conocidos.
+\item %% 2
+  Determinar la formulación variacional (mixta) para el siguiente
+  problema de Stokes evolutivo: hallar $\uu:\Omega\times(0,T) \to \Rset^2$ y
+  $p:\Omega\times(0,T)\to\Rset$ tales que
+  \begin{equation*}
+   \left\{
+     \begin{aligned}
+       \dt\uu-\nu\laplace\uu + \grad p &= \ff \quad \text{en } \Omega\times(0,T) ,\\
+       \div\uu &=0 \quad\text{en } \Omega\times(0,T),\\
+       \uu &=0 \quad\text{sobre } \partial\Omega, \quad \uu|_{t=0}=\uu_0\quad \text{en } \Omega
+     \end{aligned}
+   \right.
+ \end{equation*}
+ donde $\Omega\subset\Rset^2$, $T\in\Rset$ ($T>0$), $\nu\in\Rset$,
+ ($\nu>0$), $\ff:\Omega \to \Rset^2$, $\uu_0:\Omega \to \Rset^2$ son
+ datos conocidos. Usar, para aproximar la derivada temporal,
+ diferencias finitas retrógradas:
+ $$
+ \dt{u}|_{t=t_{n+1}} \approx \frac{u^{n+1}-u^n}{\Delta t},
+ $$
+ donde $\Delta t>0$ es el paso en tiempo y $t_n=n\Delta t$, $n\ge 0$
+ son instantes de tiempo en $[0,T]$.
+\end{enumerate}
+
+
+
+\end{titlepage}
+
+\end{document}
