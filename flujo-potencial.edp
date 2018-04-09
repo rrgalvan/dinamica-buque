@@ -1,0 +1,30 @@
+// Flujo potencial:
+//   u = ( dy(\phi), -dx(\phi) ),
+// where \phi is solution of
+//   \nabla^2 \psi = 0.
+//
+// * Dominio: círculo que contiene un perfil NACA0012
+// * Condiciones de contorno:
+//     \psi = 0 en NACA0012, \psi(x,y)=y en la circunferencia exterior
+//
+// Extraído del manual de FreeFem++, apartado 3.5 (ejemplo 3.5).
+
+real S=99;
+border C(t=0,2*pi) { x=5*cos(t); y=5*sin(t);}
+border Splus(t=0,1){ x = t; y = 0.17735*sqrt(t)-0.075597*t
+			      - 0.212836*(t^2)+0.17363*(t^3)-0.06254*(t^4); label=S;}
+border Sminus(t=1,0){ x =t; y= -(0.17735*sqrt(t)-0.075597*t
+				 -0.212836*(t^2)+0.17363*(t^3)-0.06254*(t^4)); label=S;}
+mesh Th= buildmesh(C(50)+Splus(70)+Sminus(70));
+fespace Vh(Th,P2);
+Vh psi,w;
+
+solve potential(psi,w)=
+  int2d(Th)(dx(psi)*dx(w)+dy(psi)*dy(w))
+  + on(C,psi = y) + on(S,psi=0);
+
+plot(psi,wait=1,
+     fill=0, // Rellenar colores?
+     value=1, // Representar valores?
+     nbiso=70, // Nº de isovalores
+     cmm="Flujo potencial");
