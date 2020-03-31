@@ -1,0 +1,103 @@
+\documentclass[8pt]{beamer}
+\usepackage{current-definitions}
+
+\title{Introducción a las EDP para fluidos}
+\author{Rafa Rodríguez Galván}
+\begin{document}
+
+\begin{frame}
+\maketitle
+\end{frame}
+\begin{frame}{Ecuaciones en Derivadas Parciales (EDP)}
+  \structure{\textbf{Tipos de EDP}} (lineales y de orden $\le 2$):
+  \begin{itemize}
+      \item Ecuaciones \alert{Elípticas}
+      \par
+      Ejemplo canónico \emph{Ecuación de Possion}:
+      $$
+      \Delta u = f
+      $$
+
+      \item Ecuaciones \alert{Parabólicas}
+      \par
+      Ejemplo canónico \emph{Ecuación del calor}:
+      $$
+      u_t - \Delta u = f
+      $$
+
+      \item Ecuaciones  \alert{Hiperbólicas}
+      \par
+      Ejemplo canónico \emph{Ecuación de transporte (o convección)}:
+      $$
+      u_t + \vv \grad u = f, \quad\text{ donde $\vv$ es un dato (vector que transporta a $u$)}
+      $$
+  \end{itemize}
+
+  \textbf{\structure{Métodos numéricos para resolución aproximada de EDP}}:
+  \begin{itemize}
+    \item \textbf{Método de las Diferencias Finitas} (MDF)
+      Usado para ecuaciones Elípticas, Parabólicas e Hiperbólicas
+    \item \textbf{Método de los Volúmenes Finitos} (MVF)
+      Usado para ecuaciones Hiperbólicas
+    \item \textbf{Método de los Elementos Finitos} (MEF)
+      Usado para ecuaciones Elípticas y Parabólicas
+    \end{itemize}
+\end{frame}
+\begin{frame}{Ecuaciones de Navier-Stokes}
+  \begin{itemize}
+  \item Sea $\Omega$ un dominio de $\Rset^d$, $d=3$.
+  \item \emph{Incógnitas}:
+  \begin{itemize}
+      \item $\uu=(u,v,w)$: campo de velocidades. $u$, $v$ y $w$ son finciones $\Omega \to \Rset$
+      \item $p$: presión, $p:\Omega \to \Rset$
+  \end{itemize}
+  \item \emph{Datos}:
+  \begin{itemize}
+    \item $\nu>0$: coeficiente de viscosidad (cintemática)
+      \item $\ff=(f_1,f_2,f_3)$ fuerza externa que actúa sobre el fluido (por ejemplo, gravedad)
+  \end{itemize}
+  \item \emph{Ecuaciones de Navier-Stokes}:
+  \begin{align}
+    u_t + \uu\cdot\grad u - \nu\Delta u + \dx p &= f_1 \text{ en } \Omega
+    \\
+    v_t + \uu\cdot\grad v - \nu\Delta v + \dy p &= f_2 \text{ en } \Omega
+    \\
+    w_t + \uu\cdot\grad w - \nu\Delta w + \dz p &= f_3 \text{ en } \Omega
+    \\
+    \div{\uu} &= 0.
+  \end{align}
+  Los términos más "delicados" (de convección o transporte no lineal)
+  \begin{align}
+  \uu\grad u &= (u,v,w) \cdot (\dx u, \dy u, \dz u)^T \\
+  &= u \dx u + v \dy u + w \dz u
+  \\
+  \uu\grad v &= u \dx v + v \dy v + w \dz v
+  \\
+  \uu\grad w &= u \dx w + v \dy w + w \dz w
+\end{align}
+  \end{itemize}
+\end{frame}
+\begin{frame}{Flujos potenciales (irrotacionales)}
+\begin{itemize}
+  \item Suponemos que existe $\Phi$ tal que $$u=\Psi_x, \ v=-\Psi_y$$
+  \item Entonces el flujo es incompresible:
+  $$
+  u_x + v_y =0.
+  $$
+  \item Suponemos que además el flujo es irrotacional:
+  $$
+  rot(u,v,w) = 0\cdot \vec{i} + 0\cdot \vec j + (v_x - u_y)\cdot \vec k = 0.
+  $$
+  O sea $v_x - u_y=0$, es decir
+  $$
+  \Delta \psi = \Psi_{xx} + \Psi_{yy} = u_x - v_y = 0.
+  $$
+  O Sea
+  \begin{align}
+    -\Delta \Psi &= 0 \quad \text{ en } \Omega \\
+    &+ \text{ cond. de contorno}
+  \end{align}
+\end{itemize}
+
+\end{frame}
+\end{document}
