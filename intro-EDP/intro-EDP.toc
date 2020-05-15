@@ -1,2 +1,0 @@
-\beamer@sectionintoc {1}{Formulación variacional de las ecuaciones de Stokes}{5}{0}{1}
-\beamer@sectionintoc {2}{Formulación variacional de sistemas evolutivos}{9}{0}{2}
