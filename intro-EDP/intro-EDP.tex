@@ -3,7 +3,21 @@
 
 \title{Introducción a las EDP para fluidos}
 \author{Rafa Rodríguez Galván}
+
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par%
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
+
+%=======================================================
 \begin{document}
+%=======================================================
 
 \begin{frame}
 \maketitle
@@ -13,21 +27,21 @@
   \begin{itemize}
       \item Ecuaciones \alert{Elípticas}
       \par
-      Ejemplo canónico \emph{Ecuación de Possion}:
+      Ejemplo canónico: \emph{ecuación de Possion}:
       $$
       \Delta u = f
       $$
 
       \item Ecuaciones \alert{Parabólicas}
       \par
-      Ejemplo canónico \emph{Ecuación del calor}:
+      Ejemplo canónico: \emph{ecuación del calor}:
       $$
       u_t - \Delta u = f
       $$
 
       \item Ecuaciones  \alert{Hiperbólicas}
       \par
-      Ejemplo canónico \emph{Ecuación de transporte (o convección)}:
+      Ejemplo canónico: \emph{ecuación de transporte (o convección)}:
       $$
       u_t + \vv \grad u = f, \quad\text{ donde $\vv$ es un dato (vector que transporta a $u$)}
       $$
@@ -77,27 +91,287 @@
 \end{align}
   \end{itemize}
 \end{frame}
-\begin{frame}{Flujos potenciales (irrotacionales)}
+\begin{frame}{Flujos potenciales (irrotacionales) e incompresibles}
 \begin{itemize}
-  \item Suponemos que existe $\Phi$ tal que $$u=\Psi_x, \ v=-\Psi_y$$
-  \item Entonces el flujo es incompresible:
+\item Suponemos que existe una función potencial, $\Phi$, tal que
+  el flujo se puede obtener como el gradiente de este potencial, es decir
+  $$u=\Psi_x, \ v=\Psi_y$$.
+  \item Entonces, el flujo es \alert{irrotacional}:
   $$
-  u_x + v_y =0.
+  rot(u,v,w) = 0\cdot \vec{i} + 0\cdot \vec j + (v_x - u_y)\cdot \vec k = 0,
   $$
-  \item Suponemos que además el flujo es irrotacional:
+  pues
   $$
-  rot(u,v,w) = 0\cdot \vec{i} + 0\cdot \vec j + (v_x - u_y)\cdot \vec k = 0.
+  v_x - u_y= (\Psi_{y})_x - (\Psi_{x})_y = \Psi_{yx} - \Psi_{xy}= \Psi_{xy} - \Psi_{xy} =  0.
   $$
-  O sea $v_x - u_y=0$, es decir
-  $$
-  \Delta \psi = \Psi_{xx} + \Psi_{yy} = u_x - v_y = 0.
-  $$
-  O Sea
+\item Si además el potencial es solución de un problema de Laplace, del tipo
   \begin{align}
-    -\Delta \Psi &= 0 \quad \text{ en } \Omega \\
-    &+ \text{ cond. de contorno}
+    \label{potencial.eq.1}
+    -\Delta \Psi &= 0 \quad \text{ en } \Omega, \\
+    \label{potencial.eq.2}
+    &+ \text{ cond. de contorno},
   \end{align}
+  entonces el flujo es \alert{incompresible}:
+  $$
+  \nabla\cdot(u,v) = u_x + v_y =\Psi_{xx} + \Psi_{yy} =  0.
+  $$
+\item Así, para determinar un flujo irrotacional e incompresible en
+  cualquier dominio $\Omega\subset\Rset^2$, basta proceder como sigue:
+  \begin{enumerate}
+  \item Resolver el
+    problema~(\ref{potencial.eq.1})--(\ref{potencial.eq.2}), por
+    ejemplo usando el método de los elementos finitos
+  \item Tomar el flujo $u=\Psi_x$, $v=\Psi_y$.
+  \end{enumerate}
+
+
 \end{itemize}
 
 \end{frame}
+
+%=======================================================
+\section{Formulación variacional de las ecuaciones de Stokes}
+%=======================================================
+
+
+\begin{frame}{Ecuaciones de Stokes estacionarias}
+  \alert{Problema de Stokes de estacionario} (con condiciones de contorno \alert{Dirichlet}):
+
+  \begin{itemize}
+
+
+  \item Supongamos dado un dominio (un conjunto abierto con frontera
+    regular) $\Omega\subset \Rset^3$.
+  \item Consideramos los datos:
+    \begin{align}
+      &\nu>0 \ \text{(coeficiente de viscosidad)},\\
+      &\ff=(f_1,f_2,f_3):\Omega \to \Rset^3 \ \text{(fuerza externa)}
+    \end{align}
+
+  \item Planteamos: hallar $u=u(\xx)$, $v=v(\xx)$, $w=w(\xx)$
+    $p=p(\xx)$, todas ellas funciones definidas en un conjunto
+    abierto $\Omega$ y con valores en $\Rset$, tales que:
+    \begin{align}
+      &- \nu\Delta u + \dx p = f_1
+      \\
+      &- \nu\Delta v + \dy p = f_2
+      \\
+      &- \nu\Delta w + \dz p = f_3
+      \\
+      \div{\uu} &= \dx u + \dy u + \dz u = 0,
+    \end{align}
+    junto a las condiciones de contorno (para los datos frontera $g_1$, $g_2$ y $g_3$)
+    \begin{align}
+      u(\xx,t)=g_1(\xx),
+      \quad
+      v(\xx,t)=g_2(\xx),
+      \quad
+      w(\xx,t)=g_3(\xx),
+      \qquad
+    \forall \xx\in\partial\Omega.
+    \end{align}
+  \end{itemize}
+
+\end{frame}
+
+
+\begin{frame}{Ecuaciones de Stokes Estacionarias: Formulación variacional (I)}
+  \begin{itemize}
+
+  \item Por simplicidad, consideramos condiciones Dirichlet homogéneas en toda la frontera de $\Omega$.
+  \item Definimos los espacio $V=H^1_0(\Omega)$ y
+    $Q=L_0^2(\Omega)$. Multiplicamos, respectivamente, a las tres
+    ecuaciones de momentos en el problema de Stokes por funciones test
+    $\bu, \bv, \bw \in V$. Multiplicamos la ecuación de divergencia
+    por otra función test $q\in Q$.
+  \item Integramos por partes cada una de estas ecuaciones, teniendo
+    en cuenta que los términos frontera son cero y, por tanto,
+    desaparecen. Así obtenemos:
+    \begin{align*}
+      \int_\Omega \nu\grad u\grad\bu - \int_\Omega p\dx \bu &= \int_\Omega f_1 \bu, \quad \forall \bu\in V,
+      \\[0.5em]
+      \int_\Omega \nu\grad v\grad\bv - \int_\Omega p\dy \bv &= \int_\Omega f_2 \bv, \quad \forall \bv\in V,
+      \\[0.5em]
+      \int_\Omega \nu\grad w\grad\bw - \int_\Omega p\dz \bw &= \int_\Omega f_3 \bw, \quad \forall \bw\in V,
+      \\[0.5em]
+      \int_\Omega \bp \div{\uu} & =  0, \quad \forall \bp \in Q.
+    \end{align*}
+
+  \end{itemize}
+\end{frame}
+
+
+
+\begin{frame}{Ecuaciones de Stokes Estacionarias: Formulación variacional (II)}
+  \begin{itemize}
+  \item Sumamos las ecuaciones anteriores y planteamos el problema:
+    Hallar $u,v,w\in H^1_0(\Omega)$ y $p\in L_0^2(\Omega)$ tales que
+    \begin{align*}
+      \int_\Omega \nu\Big( \grad u\grad\bu &+
+      \grad v\grad\bv + \grad w\grad\bw \Big)
+      \\
+      &- \int_\Omega \left( \dx \bu + \dy \bv + \dz \bw \right) p
+      \\
+      &+ \int_\Omega \left( \dx u + \dy v + \dz w \right) \bp
+      \\
+      &= \int_\Omega \left( f_1 \bu + f_2 \bv + f_3 \bw \right)
+    \end{align*}
+    $\forall \bu,\bv, \bw\in V$, $\forall\bp\in Q$.
+  \end{itemize}
+
+\end{frame}
+
+
+%=======================================================
+\section{Formulación variacional de sistemas evolutivos}
+%=======================================================
+
+%------------------------------------------------------
+\begin{frame}{Ecuación del calor}
+%------------------------------------------------------
+Fijamos un dominio espacial $\Omega\subset\Rset^n$ y un \textbf{intervalo de tiempo} $[0,T]$.
+
+Planteamos: hallar $u$ solución de
+   \begin{align}
+   \dt u - \Delta u &= f, \quad (x,t)\text{ en }\Omega\times (0,T), \\
+   u(x,t) &= g(x,t) \quad\text{ sobre } \partial\Omega \quad \text{(condición de contorno)},\\
+   u(x,0) &= u_0(x) \quad x\in\Omega, \text{(condición inicial)}.
+ \end{align}
+ donde $f$, $u_0$ y $g$ son funciones conocidas (datos).
+\end{frame}
+
+
+%------------------------------------------------------
+\begin{frame}{Discretización en tiempo}
+%------------------------------------------------------
+Consideramos la siguiente partición del \textbf{intervalo de tiempo} $[0,T]$:
+
+$$
+0=t_0 < t_1 < t_2 < \dots < t_m < t_{m+1} < \dots  < t_M=T.
+$$
+\begin{itemize}
+  \item Suponemos que $t_{m+1}-t_m = \Delta t$ (constante).
+  \item Intentaremos hallar ciertos valores $u^m\approx u_(t_m)$, para $m=0,1,...,M$.
+\end{itemize}
+Calculamos los valores $u^m$ de la siguiente forma:
+\begin{itemize}
+  \item Inicialización: para $m=0$: $u^0=u_0$ ($u_0$ es el dato inicial).
+  \item Iteración de tiempo $m$: conocida la solución en la etapa $m-1$, hallamos $u^m$ como solución de:
+   \begin{align}
+     \frac{u^m-u^{m-1}}{\Delta t} - \Delta u^m &= f^m \quad\text{ en } \Omega
+     \\
+   u^m &= g^m \quad\text{ sobre } \partial\Omega \quad \text{(condición de contorno)},\\
+   \end{align}
+   donde $f^m(x)$ y $g^m(x)$ denotan respectivamente a $f(x,t^m)$ y $g(x,t^m)$.
+   \item El problema anterior es estacionario (el tiempo $t_m$ está fijo) y lo podemos resolver mediante el MEF.
+   \item A este tipo de discretizaciones en tiempo se les llama método de \textbf{Euler implícito}.
+\end{itemize}
+
+\end{frame}
+
+
+%------------------------------------------------------
+\begin{frame}{Ecuaciones de Stokes de evolución}
+%------------------------------------------------------
+
+  \alert{Problema de Stokes de evolución} (con condiciones de contorno \alert{Dirichlet}):
+
+  \begin{itemize}
+  \item Supongamos dado un dominio (un conjunto abierto con frontera
+    regular) $\Omega\subset \Rset^3$ y un intervalo temporal $[0,T]$,
+    siendo $T>0$ el tiempo final de observación.
+  \item Consideramos los datos:
+    \begin{align}
+      &\nu>0 \ \text{(coeficiente de viscosidad)},\\
+      &\ff=(f_1,f_2,f_3):\Omega\times [0,T] \to \Rset^3 \ \text{(fuerza externa)}
+    \end{align}
+
+  \item Planteamos: hallar $u=u(\xx,t)$, $v=v(\xx,t)$, $w=w(\xx,t)$
+    $p=p(\xx,t)$, todas ellas funciones definidas en un conjunto
+    abierto $\Omega$ y con valores en $\Rset$, tales que:
+    \begin{align}
+      \dt u &- \nu\Delta u + \dx p = f_1
+      \\
+      \dt v &- \nu\Delta v + \dy p = f_2
+      \\
+      \dz w &- \nu\Delta w + \dz p = f_3
+      \\
+      \div{\uu} &= \dx u + \dy u + \dz u = 0,
+    \end{align}
+    junto a las condiciones de contorno (para los datos frontera $g_1$, $g_2$ y $g_3$)
+    \begin{align}
+      u(\xx,t)=g_1(\xx,t),
+      \quad
+      v(\xx,t)=g_2(\xx,t),
+      \quad
+      w(\xx,t)=g_3(\xx,t),
+      \\
+    \forall \xx\in\partial\Omega, \ \forall t\in(0,T)
+    \end{align}
+    y las condiciones iniciales (para los datos iniciales $u_1$, $u_2$, $u_3$)
+    $$
+    u(\xx,0) = u_0(\xx), \quad v(\xx,0)=v_0(\xx), \quad w(\xx,0)=w_0(\xx),
+    $$
+  \end{itemize}
+
+\end{frame}
+
+%------------------------------------------------------
+\begin{frame}{Discrtetización del problema de Stokes evolutivo}
+%------------------------------------------------------
+
+  \begin{itemize}
+
+  \item Planteamos: hallar $u^m\approx u(\xx,t_m)$, $v^m\approx v(\xx,t_m)$, $w^m\approx w(\xx,t_tm)$, $p^m\approx p(\xx,t_m)$, todas ellas funciones definidas en un conjunto
+    abierto $\Omega$, tales que:
+    \begin{align}
+      \frac{u^m - u^{m-1}}{\Delta t} &- \nu\Delta u^m + \dx p^m = f^m_1
+      \\
+      \frac{v^m - v^{m-1}}{\Delta t} &- \nu\Delta v^m + \dy p^m = f^m_2
+      \\
+      \frac{w^m - w^{m-1}}{\Delta t} &- \nu\Delta w^m + \dz p^m = f^m_3
+      \\
+      \div{\uu^m} &= \dx u^m + \dy u^m + \dz u^m = 0,
+    \end{align}
+    junto a las condiciones de contorno (para los datos frontera $g_1$, $g_2$ y $g_3$)
+    \begin{align}
+      u^m=g_1^m
+      \quad
+      v^m(\xx,t)=g_2^m
+      \quad
+      w^m(\xx,t)=g_3^m
+      \\
+    \forall \xx\in\partial\Omega
+    \end{align}
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}{Ecuaciones de Stokes Evolutivas: Formulación variacional (II)}
+  En la etapa de tiempo $m$ (conocidas $u^{m-1}$, $v^{m-1}$, $w^{m-1}$), hallar $u^m$, $v^m$, $w^m \in H^1_0(\Omega)$ y $p^m\in L_0^2(\Omega)$ tales que:
+    \begin{align*}
+      \frac{1}{\Delta t} \int_\Omega\big(
+      u^m \bu
+      &+ {v^m} \bv
+      + {w^m} \bw
+      \big)
+      + \int_\Omega \nu\Big( \grad u^m \grad\bu +
+      \grad v^m\grad\bv + \grad w^m\grad\bw \Big)
+      \\
+      &- \int_\Omega \left( \dx \bu + \dy \bv + \dz \bw \right) p^m
+      \\
+      &+ \int_\Omega \left( \dx u^m + \dy v^m  + \dz w^m \right) \bp
+      \\
+      &=
+      \frac{1}{\Delta t} \int_\Omega\big(
+      u^{m-1} \bu
+      + {v^{m-1}} \bv
+      + {w^{m-1}} \bw
+      \big)
+       + \int_\Omega \left( f^m_1 \bu + f^m_2 \bv + f^m_3 \bw \right)
+    \end{align*}
+    $\forall \bu,\bv, \bw\in V$, $\forall\bp\in Q$.
+
+\end{frame}
+
 \end{document}

@@ -88,11 +88,11 @@ problem stokes2d( [u,v,p], [uu,vv,pp]
 
 stokes2d; // Resolución del problema de Stokes
 
-p=p*rho; // Re-escalo la presión (en las ecuaciones, se dividió por rho)
-p=p+pInf; // ... y sumo presión de referencia
+//p=p*rho; // Re-escalo la presión (en las ecuaciones, se dividió por rho)
+//p=p+pInf; // ... y sumo presión de referencia
 
-cout << "Valor min/max para p: " << p[].min  << "/"
-     << p[].max << endl;
+// cout << "Valor min/max para p: " << p[].min  << "/"
+     // << p[].max << endl;
 
 // Fuerza de arrastre (apuntes P. López, D. Buque, 2017):
 //   F_i = \int_{superficie} \sigma_{ij}  d A_j,
@@ -117,15 +117,15 @@ cout << "Fuerza debida a esfuerzos (m'odulo):" << sqrt(fTau1^2+fTau2^2) << endl;
 // cout << "Arrastre:" << arrastre << endl;
 cout << "Previsto:" << 3*pi*mu*V*2*R << endl;
 
-
 // Vorticity
 vort = dy(u) - dx(v);
 
 plot(Th, [u,v], value=1, wait=1);
-plot(Th, p, fill=1, value=1, wait=1);
-plot(Th, vort, fill=1, value=1, wait=1);
+plot(Th, p, fill=1, value=1, wait=1, cmm="Pressure");
+plot(Th, vort, fill=1, value=1, wait=1, cmm="Vorticity");
 
 // Save to VTK (for high quality plotting)
 load "iovtk";
-savevtk("stokes-drag-cylinder.vtk", Th, [u,v,0], p, vort,
+int[int] fforder=[1,1,1,1]; // Orden polinómico de las variables
+savevtk("stokes-drag-cylinder.vtk", Th, [u,v,0], p, vort, order=fforder,
 	dataname="Velocity Pressure Vorticity");

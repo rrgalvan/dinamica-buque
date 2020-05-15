@@ -1,7 +1,7 @@
-// Problema de Stokes evolutivo 2D:
+// Problema de Navier-Stokes evolutivo 2D:
 //
-// dt(u) - nu*( dxx(u) + dyy(u) ) + dx(p) = 0
-// dt(u) - nu*( dxx(v) + dyy(v) ) + dy(p) = 0
+// dt(u) + (u,v) grad(u) - nu*( dxx(u) + dyy(u) ) + dx(p) = 0
+// dt(v) + (u,v) grad(v) - nu*( dxx(v) + dyy(v) ) + dy(p) = 0
 //         dx(u) + dy(v) = 0
 //   + condiciones_de_contorno
 //   + condicion_inicial
@@ -160,7 +160,8 @@ for(iter=0; iter<niter; iter++)
     // Save to VTK (for high quality plottin)
     load "iovtk";
     string filename = "navier-stokes-cylinder-iter" + iter + ".vtk";
-    savevtk(filename, Th, [u,v,0], p, vort,
+    int[int] fforder = [1,1,1,1];
+    savevtk(filename, Th, [u,v,0], p, vort, order=fforder,
 	    dataname="Velocity Pressure Vorticity");
 
 

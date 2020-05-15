@@ -19,7 +19,7 @@ mesh Th= buildmesh(C(50)+Splus(70)+Sminus(70));
 fespace Vh(Th,P2);
 Vh psi,w;
 
-solve potential(psi,w, solver=LU)=
+solve potential(psi,w)=
   int2d(Th)(dx(psi)*dx(w)+dy(psi)*dy(w))
   + on(C,psi = y) + on(S,psi=0);
 
@@ -28,7 +28,3 @@ plot(psi,wait=1,
      value=1, // Representar valores?
      nbiso=70, // Nº de isovalores
      cmm="Flujo potencial");
-
-load "iovtk"
-int[int] ord = [1];
-savevtk("flujo-potencial.vtu", Th, psi, dataname="psi", order=ord);
