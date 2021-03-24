@@ -15,6 +15,9 @@
   \end{frame}
 }
 
+\usepackage{xcolor}
+\newcommand{\matcolbox}[2][red]{\fcolorbox{#1}{white}{$\!#2\!$}}
+
 %=======================================================
 \begin{document}
 %=======================================================
@@ -57,6 +60,7 @@
       Usado para ecuaciones Elípticas y Parabólicas
     \end{itemize}
 \end{frame}
+
 \begin{frame}{Ecuaciones de Navier-Stokes}
   \begin{itemize}
   \item Sea $\Omega$ un dominio de $\Rset^d$, $d=3$.
@@ -72,7 +76,10 @@
   \end{itemize}
   \item \emph{Ecuaciones de Navier-Stokes}:
   \begin{align}
-    u_t + \uu\cdot\grad u - \nu\Delta u + \dx p &= f_1 \text{ en } \Omega
+    u_t + \uu\cdot\grad u - \nu
+    \only<2>{\matcolbox[white]{\Delta u}{}}
+    \only<1>{\matcolbox{\Delta u}}
+    + \dx p &= f_1 \text{ en } \Omega
     \\
     v_t + \uu\cdot\grad v - \nu\Delta v + \dy p &= f_2 \text{ en } \Omega
     \\
@@ -91,6 +98,7 @@
 \end{align}
   \end{itemize}
 \end{frame}
+
 \begin{frame}{Flujos potenciales (irrotacionales) e incompresibles}
 \begin{itemize}
 \item Suponemos que existe una función potencial, $\Phi$, tal que
