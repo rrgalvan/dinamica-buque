@@ -1,5 +1,8 @@
-
-\RequirePackage{hyperref}
+% \RequirePackage[hidelinks]{hyperref} % Error Option clash for package hyperref
+\PassOptionsToPackage{hidelinks}{hyperref}
+\AtEndPreamble{%
+  \RequirePackage{hyperref}}
+% \RequirePackage[T1]{fontenc}
 
 % ------- Mathematics ---------
 \RequirePackage{amsmath}
@@ -406,6 +409,8 @@
 %%% Beamer presentations
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\beamertemplatenavigationsymbolsempty
+
 % Define a special style at begining of sections
 \newcommand{\SetEmptyBackground}{
   \setbeamertemplate{background}{}
@@ -466,26 +471,26 @@
 % Vídeo
 %%%%%%%%%
 
-\usepackage{movie15}
+% \usepackage{movie15}
 
-\newcommand{\playVideoHref}[3]{\href{run:#3}{\rule{#1}{#2}}}
+% \newcommand{\playVideoHref}[3]{\href{run:#3}{\rule{#1}{#2}}}
 
-\newcommand{\playVideoMovie}[3]{%
-  \includemovie[autoplay,
-  % , controls % Show Play/Stop buttons
-  ]{#1}{#2}{#3}}
+% \newcommand{\playVideoMovie}[3]{%
+%   \includemovie[autoplay,
+%   % , controls % Show Play/Stop buttons
+%   ]{#1}{#2}{#3}}
 
-\usepackage{xparse} % From future LaTeX 3
-\DeclareDocumentCommand{\PlayVideoWithLabel}{%
-  O{0.5\linewidth} O{0.5\linewidth}  O{} m }{%
-  % #1: width of video box
-  % #2: height of video box
-  % #3: Label
-  % #4: Video file
-  \begin{BoxWithVerticalLabel}{#3}{#1}
-    % \playVideoHref{#1}{#2}{#4}
-    \playVideoMovie{#1}{#2}{#4} % Works in okular
-  \end{BoxWithVerticalLabel}}
+% \usepackage{xparse} % From future LaTeX 3
+% \DeclareDocumentCommand{\PlayVideoWithLabel}{%
+%   O{0.5\linewidth} O{0.5\linewidth}  O{} m }{%
+%   % #1: width of video box
+%   % #2: height of video box
+%   % #3: Label
+%   % #4: Video file
+%   \begin{BoxWithVerticalLabel}{#3}{#1}
+%     % \playVideoHref{#1}{#2}{#4}
+%     \playVideoMovie{#1}{#2}{#4} % Works in okular
+%   \end{BoxWithVerticalLabel}}
 
 % ---------- Discontinous Galerkin ----------------
 \newcommand{\Eh}{\ensuremath{{\cal E}_h}\xspace}

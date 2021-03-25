@@ -1,5 +1,9 @@
-\documentclass[8pt]{beamer}
+\documentclass[9pt]{beamer}
 \usepackage{current-definitions}
+
+% Resolver problemas con negritas en Beamer
+% https://tex.stackexchange.com/questions/565069/beamer-bold-math-no-longer-working
+\DeclareFontShape{OT1}{cmss}{b}{n}{<->ssub * cmss/bx/n}{}
 
 \title{Introducción a las EDP para fluidos}
 \author{Rafa Rodríguez Galván}
@@ -17,6 +21,11 @@
 
 \usepackage{xcolor}
 \newcommand{\matcolbox}[2][red]{\fcolorbox{#1}{white}{$\!#2\!$}}
+\newcommand{\altbox}[2]{
+    % \invisible<#1>{\matcolbox[white]{#2}{}}
+    % \only<#1>{\matcolbox{#2}}
+  #2
+    }
 
 %=======================================================
 \begin{document}
@@ -28,38 +37,44 @@
 \begin{frame}{Ecuaciones en Derivadas Parciales (EDP)}
   \structure{\textbf{Tipos de EDP}} (lineales y de orden $\le 2$):
   \begin{itemize}
-      \item Ecuaciones \alert{Elípticas}
-      \par
-      Ejemplo canónico: \emph{ecuación de Possion}:
-      $$
-      \Delta u = f
-      $$
-
-      \item Ecuaciones \alert{Parabólicas}
-      \par
-      Ejemplo canónico: \emph{ecuación del calor}:
-      $$
-      u_t - \Delta u = f
-      $$
-
-      \item Ecuaciones  \alert{Hiperbólicas}
-      \par
-      Ejemplo canónico: \emph{ecuación de transporte (o convección)}:
-      $$
-      u_t + \vv \grad u = f, \quad\text{ donde $\vv$ es un dato (vector que transporta a $u$)}
-      $$
+  \item Ecuaciones \alert{Elípticas}
+    \begin{quote}
+      Ejemplo canónico: \textbf{ecuación de Possion}:
+      \begin{align*}
+        -\Delta u &= f \quad \uncover<2>{\structure{\text{ en  } \Omega}} \\
+        \uncover<2>{\structure u& \structure{=0 \quad\text{ sobre }\partial\Omega}}
+      \end{align*}
+    \end{quote}
+  \item Ecuaciones \alert{Parabólicas}
+    \begin{quote}
+      Ejemplo canónico: \textbf{ecuación del calor}:
+      \begin{align*}
+      u_t - \Delta u &= f \quad \uncover<2>{\structure{\text{ en  } \Omega}} \\
+        \uncover<2>{\structure u& \structure{=0 \quad\text{ sobre }\partial\Omega}}
+      \end{align*}
+    \end{quote}
+  \item Ecuaciones  \alert{Hiperbólicas}
+    \begin{quote}
+      Ejemplo canónico: \textbf{ecuación de transporte}:
+      \begin{align*}
+      u_t + \mathbf{v} \grad u = f,
+      \end{align*}
+      \quad donde $\vv$ es un dato (vector que transporta a $u$).
+    \end{quote}
   \end{itemize}
-
-  \textbf{\structure{Métodos numéricos para resolución aproximada de EDP}}:
-  \begin{itemize}
-    \item \textbf{Método de las Diferencias Finitas} (MDF)
-      Usado para ecuaciones Elípticas, Parabólicas e Hiperbólicas
-    \item \textbf{Método de los Volúmenes Finitos} (MVF)
-      Usado para ecuaciones Hiperbólicas
-    \item \textbf{Método de los Elementos Finitos} (MEF)
-      Usado para ecuaciones Elípticas y Parabólicas
-    \end{itemize}
 \end{frame}
+
+\begin{frame}{Métodos numéricos para resolución aproximada de EDP}
+  \begin{itemize}
+    \setlength\itemsep{0.9em}
+    \item \textbf{Método de las Diferencias Finitas} (MDF)
+      Indicado para ecuaciones \textit{Elípticas}, \textit{Parabólicas} e \textit{Hiperbólicas}
+    \item \textbf{Método de los Volúmenes Finitos} (MVF)
+      Indicado para ecuaciones \textit{Hiperbólicas}
+    \item \textbf{Método de los Elementos Finitos} (MEF)
+      Indicado para ecuaciones \textit{Elípticas} y \textit{Parabólicas}
+    \end{itemize}
+  \end{frame}
 
 \begin{frame}{Ecuaciones de Navier-Stokes}
   \begin{itemize}
@@ -76,9 +91,11 @@
   \end{itemize}
   \item \emph{Ecuaciones de Navier-Stokes}:
   \begin{align}
-    u_t + \uu\cdot\grad u - \nu
-    \only<2>{\matcolbox[white]{\Delta u}{}}
-    \only<1>{\matcolbox{\Delta u}}
+    \altbox1{u_t}
+    +
+    \altbox2{\uu\cdot\grad u}
+    - \nu
+    \altbox3{\Delta u}
     + \dx p &= f_1 \text{ en } \Omega
     \\
     v_t + \uu\cdot\grad v - \nu\Delta v + \dy p &= f_2 \text{ en } \Omega
@@ -87,16 +104,29 @@
     \\
     \div{\uu} &= 0.
   \end{align}
-  Los términos más "delicados" (de convección o transporte no lineal)
-  \begin{align}
-  \uu\grad u &= (u,v,w) \cdot (\dx u, \dy u, \dz u)^T \\
-  &= u \dx u + v \dy u + w \dz u
-  \\
-  \uu\grad v &= u \dx v + v \dy v + w \dz v
-  \\
-  \uu\grad w &= u \dx w + v \dy w + w \dz w
-\end{align}
+%   Los términos más "delicados" (de convección o transporte no lineal)
+%   \begin{align*}
+%   \uu\grad u &= (u,v,w) \cdot (\dx u, \dy u, \dz u)^T \\
+%   &= u \dx u + v \dy u + w \dz u
+%   \\
+%   \uu\grad v &= u \dx v + v \dy v + w \dz v
+%   \\
+%   \uu\grad w &= u \dx w + v \dy w + w \dz w
+% \end{align*}
   \end{itemize}
+  \vfill
+\end{frame}
+
+\begin{frame}{Notas (I)}
+
+\end{frame}
+
+\begin{frame}{Notas (II)}
+
+\end{frame}
+
+
+\begin{frame}{Notas (III)}
 \end{frame}
 
 \begin{frame}{Flujos potenciales (irrotacionales) e incompresibles}
@@ -115,7 +145,7 @@
 \item Si además el potencial es solución de un problema de Laplace, del tipo
   \begin{align}
     \label{potencial.eq.1}
-    -\Delta \Psi &= 0 \quad \text{ en } \Omega, \\
+    -\Delta \Psi &= 0 \quad text{ en } \Omega, \\
     \label{potencial.eq.2}
     &+ \text{ cond. de contorno},
   \end{align}
@@ -151,15 +181,15 @@
   \item Supongamos dado un dominio (un conjunto abierto con frontera
     regular) $\Omega\subset \Rset^3$.
   \item Consideramos los datos:
-    \begin{align}
+    \begin{align*}
       &\nu>0 \ \text{(coeficiente de viscosidad)},\\
       &\ff=(f_1,f_2,f_3):\Omega \to \Rset^3 \ \text{(fuerza externa)}
-    \end{align}
+    \end{align*}
 
   \item Planteamos: hallar $u=u(\xx)$, $v=v(\xx)$, $w=w(\xx)$
     $p=p(\xx)$, todas ellas funciones definidas en un conjunto
     abierto $\Omega$ y con valores en $\Rset$, tales que:
-    \begin{align}
+    \begin{align*}
       &- \nu\Delta u + \dx p = f_1
       \\
       &- \nu\Delta v + \dy p = f_2
@@ -167,9 +197,9 @@
       &- \nu\Delta w + \dz p = f_3
       \\
       \div{\uu} &= \dx u + \dy v + \dz w = 0,
-    \end{align}
+    \end{align*}
     junto a las condiciones de contorno (para los datos frontera $g_1$, $g_2$ y $g_3$)
-    \begin{align}
+    \begin{align*}
       u(\xx,t)=g_1(\xx),
       \quad
       v(\xx,t)=g_2(\xx),
@@ -177,7 +207,7 @@
       w(\xx,t)=g_3(\xx),
       \qquad
     \forall \xx\in\partial\Omega.
-    \end{align}
+    \end{align*}
   \end{itemize}
 
 \end{frame}
