@@ -1,4 +1,4 @@
-\documentclass[9pt]{beamer}
+\documentclass[9pt, dvipsnames]{beamer}
 \usepackage{current-definitions}
 
 % Resolver problemas con negritas en Beamer
@@ -20,12 +20,16 @@
 }
 
 \usepackage{xcolor}
-\newcommand{\matcolbox}[2][red]{\fcolorbox{#1}{white}{$\!#2\!$}}
-\newcommand{\altbox}[2]{
-    % \invisible<#1>{\matcolbox[white]{#2}{}}
-    % \only<#1>{\matcolbox{#2}}
-  #2
-    }
+\newcommand{\matcolbox}[2][red]{%
+  \setlength{\fboxrule}{1.66pt}%
+  \fcolorbox{#1}{white}{$\!#2\!$}}
+\newcommand{\altbox}[4][red]{%
+  \only<#2>{\matcolbox[#1]{#4}}
+  \only<#3>{\matcolbox[white]{#4}{}}
+}
+\newcommand{\nota}[3][red]{%
+  \only<#2>{{\color{#1}$\bullet$} #3}}
+
 
 %=======================================================
 \begin{document}
@@ -34,6 +38,8 @@
 \begin{frame}
 \maketitle
 \end{frame}
+
+
 \begin{frame}{Ecuaciones en Derivadas Parciales (EDP)}
   \structure{\textbf{Tipos de EDP}} (lineales y de orden $\le 2$):
   \begin{itemize}
@@ -49,7 +55,7 @@
     \begin{quote}
       Ejemplo canónico: \textbf{ecuación del calor}:
       \begin{align*}
-      u_t - \Delta u &= f \quad \uncover<2>{\structure{\text{ en  } \Omega}} \\
+        u_t - \Delta u &= f \quad \uncover<2>{\structure{\text{ en  } \Omega}} \\
         \uncover<2>{\structure u& \structure{=0 \quad\text{ sobre }\partial\Omega}}
       \end{align*}
     \end{quote}
@@ -57,7 +63,7 @@
     \begin{quote}
       Ejemplo canónico: \textbf{ecuación de transporte}:
       \begin{align*}
-      u_t + \mathbf{v} \grad u = f,
+        u_t + \mathbf{v} \grad u = f,
       \end{align*}
       \quad donde $\vv$ es un dato (vector que transporta a $u$).
     \end{quote}
@@ -67,43 +73,98 @@
 \begin{frame}{Métodos numéricos para resolución aproximada de EDP}
   \begin{itemize}
     \setlength\itemsep{0.9em}
-    \item \textbf{Método de las Diferencias Finitas} (MDF)
-      Indicado para ecuaciones \textit{Elípticas}, \textit{Parabólicas} e \textit{Hiperbólicas}
-    \item \textbf{Método de los Volúmenes Finitos} (MVF)
-      Indicado para ecuaciones \textit{Hiperbólicas}
-    \item \textbf{Método de los Elementos Finitos} (MEF)
-      Indicado para ecuaciones \textit{Elípticas} y \textit{Parabólicas}
-    \end{itemize}
-  \end{frame}
+  \item \textbf{Método de las Diferencias Finitas} (MDF)
+    Indicado para ecuaciones \textit{Elípticas}, \textit{Parabólicas} e \textit{Hiperbólicas}
+  \item \textbf{Método de los Volúmenes Finitos} (MVF)
+    Indicado para ecuaciones \textit{Hiperbólicas}
+  \item \textbf{Método de los Elementos Finitos} (MEF)
+    Indicado para ecuaciones \textit{Elípticas} y \textit{Parabólicas}
+  \end{itemize}
+\end{frame}
 
-\begin{frame}{Ecuaciones de Navier-Stokes}
+\begin{frame}{Ecuaciones de Navier-Stokes (I)}
   \begin{itemize}
-  \item Sea $\Omega$ un dominio de $\Rset^d$, $d=3$.
-  \item \emph{Incógnitas}:
-  \begin{itemize}
-      \item $\uu=(u,v,w)$: campo de velocidades. $u$, $v$ y $w$ son finciones $\Omega \to \Rset$
-      \item $p$: presión, $p:\Omega \to \Rset$
+  \item Sea $\Omega$ un dominio de $\Rset^d$, $d=3$. Puntos $(x,y,z)\in\Rset$
+  \item<2-> \emph{Incógnitas}:
+    \begin{itemize}
+    \item $\uu=(u,v,w)$: campo de velocidades. $u$, $v$ y $w$: $\Omega \to \Rset$
+    \item $p$: presión, $p:\Omega \to \Rset$
+    \end{itemize}
+  \item <2->
+    \begin{small}
+      Cada incógnita es una función, que varía en cada punto
+      $(x,y,z)\in\Omega$ \par\hfill \dots y usualmente, también con el tiempo, $t$. Por ejemplo, $p=p(x,y,z,t)$
+    \end{small}
+    \begin{center}
+      \begin{overprint}
+        \includegraphics<1>[width=0.75\linewidth]{domain-cylinder.png}
+        \includegraphics<2->[width=0.75\linewidth]{v+p-cylinder.png}
+      \end{overprint}
+    \end{center}
   \end{itemize}
-  \item \emph{Datos}:
+\end{frame}
+
+\begin{frame}{Ecuaciones de Navier-Stokes (II)}
+  \alert{Expresión abreviada} (luego la desarrollaremos):
+  \begin{align*}
+    \altbox[ForestGreen]{2}{-1,3-}{
+    \uu_t
+    + \uu\cdot\grad \uu
+    - \nu \Delta \uu
+    +  \grad p
+    = \ff \text{ en } \Omega,
+    }
+    \\
+    \altbox[pink]{3}{-2,4-}{
+    \div{\uu} = 0 \text{ en } \Omega.}
+  \end{align*}
+  \only<2>{{\color{ForestGreen}$\bullet$} Ecuación de momentos (vectorial, pues $\uu=(u,v,w)$)}
+  \only<3>{{\color{pink}$\bullet$} Ecuación de incompresibilidad }
+  \only<4->{
+  \emph{Datos}:
   \begin{itemize}
-    \item $\nu>0$: coeficiente de viscosidad (cintemática)
-      \item $\ff=(f_1,f_2,f_3)$ fuerza externa que actúa sobre el fluido (por ejemplo, gravedad)
+  \item<4-> $\nu>0$: coeficiente de viscosidad (cinemática)
+    \par\hfill ``inverso del número de \textit{Reynolds}'' ($Re \sim 1/\nu$, si $U,L\sim 1$).
+      \begin{itemize}
+      \item Caso $Re \gg$ (``$\nu\ll$''): flujo laminar
+      \item Caso $Re \ll$ (``$\nu\gg$''): flujo turbulento
+      \end{itemize}
+    \item<4-> $\ff=(f_1,f_2,f_3)$ fuerza externa que actúa sobre el fluido (ejemplo: gravedad)
   \end{itemize}
-  \item \emph{Ecuaciones de Navier-Stokes}:
-  \begin{align}
-    \altbox1{u_t}
-    +
-    \altbox2{\uu\cdot\grad u}
-    - \nu
-    \altbox3{\Delta u}
-    + \dx p &= f_1 \text{ en } \Omega
+  }
+\end{frame}
+
+
+\begin{frame}{Ecuaciones de Navier-Stokes (III)}
+\begin{itemize}
+\item \emph{Navier-Stokes, expresión extendida}:
+  \begin{align*}
+    \altbox[ForestGreen]{2}{-1,3-}{u_t}
+    + \altbox{3}{-2,4-}{\uu\cdot\grad u}
+    - \nu \altbox[NavyBlue]{4}{-3,5-}{\Delta u}
+    + \altbox[orange]{5}{-4,6-}{\dx p}
+    &= f_1 \text{ en } \Omega
     \\
-    v_t + \uu\cdot\grad v - \nu\Delta v + \dy p &= f_2 \text{ en } \Omega
+    \altbox[ForestGreen]{2}{-1,3-}{v_t}
+    + \altbox{3}{-2,4-}{\uu\cdot\grad v}
+    - \nu \altbox[NavyBlue]{4}{-3,5-}{\Delta v}
+    + \altbox[orange]{5}{-4,6-}{\dy p}
+    &= f_2 \text{ en } \Omega
     \\
-    w_t + \uu\cdot\grad w - \nu\Delta w + \dz p &= f_3 \text{ en } \Omega
+    \altbox[ForestGreen]{2}{-1,3-}{w_t}
+    + \altbox{3}{-2,4-}{\uu\cdot\grad w}
+    - \nu \altbox[NavyBlue]{4}{-3,5-}{\Delta w}
+    + \altbox[orange]{5}{-4,6-}{\dz p}
+    &= f_3 \text{ en } \Omega
     \\
-    \div{\uu} &= 0.
-  \end{align}
+    \altbox[pink]{6}{-5}{\div{\uu}} &= 0.
+  \end{align*}
+  \nota[ForestGreen]{2}{Variación del flujo con el tiempo, $t$}
+  \nota{3}{Términos de inercia \texttt{no lineales} y ``de tipo \textbf{hiperbólico}}
+  \nota[NavyBlue]{4}{Términos viscosos o difusivos}
+  \nota[orange]{5}{Gradiente de presión}
+  \nota[pink]{6}{Divergencia nula \scriptsize (ecuación de incompresibilidad o de conservación de la masa)}
+
 %   Los términos más "delicados" (de convección o transporte no lineal)
 %   \begin{align*}
 %   \uu\grad u &= (u,v,w) \cdot (\dx u, \dy u, \dz u)^T \\
