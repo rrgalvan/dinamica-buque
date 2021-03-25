@@ -44,30 +44,51 @@
   \structure{\textbf{Tipos de EDP}} (lineales y de orden $\le 2$):
   \begin{itemize}
   \item Ecuaciones \alert{Elípticas}
-    \begin{quote}
-      Ejemplo canónico: \textbf{ecuación de Possion}:
+      \par\quad Ejemplo canónico: \textbf{ecuación de Possion}:
       \begin{align*}
-        -\Delta u &= f \quad \uncover<2>{\structure{\text{ en  } \Omega}} \\
-        \uncover<2>{\structure u& \structure{=0 \quad\text{ sobre }\partial\Omega}}
+        -\Delta u &= f \quad \only<2->{\structure{\text{ en  } \Omega}}
       \end{align*}
-    \end{quote}
   \item Ecuaciones \alert{Parabólicas}
-    \begin{quote}
-      Ejemplo canónico: \textbf{ecuación del calor}:
+      \par\quad Ejemplo canónico: \textbf{ecuación del calor}:
       \begin{align*}
-        u_t - \Delta u &= f \quad \uncover<2>{\structure{\text{ en  } \Omega}} \\
-        \uncover<2>{\structure u& \structure{=0 \quad\text{ sobre }\partial\Omega}}
+        u_t - \Delta u &= f \quad \only<2->{\structure{\text{ en  } \Omega}}
       \end{align*}
-    \end{quote}
   \item Ecuaciones  \alert{Hiperbólicas}
-    \begin{quote}
-      Ejemplo canónico: \textbf{ecuación de transporte}:
+    \par\quad Ejemplo canónico: \textbf{ecuación de transporte}:
       \begin{align*}
         u_t + \mathbf{v} \grad u = f,
       \end{align*}
       \quad donde $\vv$ es un dato (vector que transporta a $u$).
-    \end{quote}
   \end{itemize}
+  \medskip
+  \uncover<2->{\alert{Condiciones de contorno} (adicionales sobre
+    $\partial\Omega$, unicidad de solución)
+    \smallskip
+  \begin{itemize}
+  \item
+    \only<2-3>{ \alert{$u=\structure g$} \quad
+          sobre $\partial\Omega$ \ (Cond. Contorno
+        \textbf{Dirichlet}, \structure{$g$: dato})}
+    \only<4-5>{\alert{$u=\structure 0$} \quad
+          sobre $\partial\Omega$ \ (Cond. Contorno
+        \textbf{Dirichlet \structure{Homogéneas}})}
+  \item
+    \only<3>{ \alert{$\grad u\cdot\nn = \structure g$} \quad
+          sobre $\partial\Omega$ \ (Cond. Contorno
+        \textbf{Neumann}, \structure{$g$: dato})}
+    \only<5>{ \alert{$\grad u\cdot\nn =\structure 0$} \quad
+          sobre $\partial\Omega$ \ (Cond. Contorno
+        \textbf{Neumann \structure{Homogéneas}})}
+  % \item
+  %   \only<2>{\bullet\ & \color{NavyBlue} \grad u \cdot \nn
+  %     {\color{NavyBlue}={\color{NavyBlue}g} \quad\text{ sobre
+  %       }\partial\Omega} \ \text{\small (Cond. Contorno
+  %       \textbf{Neumann})}} \only<3>{\bullet\ & \color{NavyBlue} \grad
+  %     u \cdot \nn {\color{NavyBlue}=0 \quad\text{ sobre
+  %       }\partial\Omega} \ \text{\small (Cond. contorno
+  %       \textbf{Neumann} \color{NavyBlue}{Homogéneas}})}
+  \end{itemize}
+  }
 \end{frame}
 
 \begin{frame}{Métodos numéricos para resolución aproximada de EDP}
@@ -95,13 +116,13 @@
       Cada incógnita es una función, que varía en cada punto
       $(x,y,z)\in\Omega$ \par\hfill \dots y usualmente, también con el tiempo, $t$. Por ejemplo, $p=p(x,y,z,t)$
     \end{small}
-    \begin{center}
-      \begin{overprint}
-        \includegraphics<1>[width=0.75\linewidth]{domain-cylinder.png}
-        \includegraphics<2->[width=0.75\linewidth]{v+p-cylinder.png}
-      \end{overprint}
-    \end{center}
   \end{itemize}
+  \begin{center}
+    \begin{overprint}
+      \includegraphics<1>[width=0.75\linewidth]{domain-cylinder.png}
+      \includegraphics<2->[width=0.75\linewidth]{v+p-cylinder.png}
+    \end{overprint}
+  \end{center}
 \end{frame}
 
 \begin{frame}{Ecuaciones de Navier-Stokes (II)}
@@ -119,15 +140,19 @@
     \div{\uu} = 0 \text{ en } \Omega.}
   \end{align*}
   \only<2>{{\color{ForestGreen}$\bullet$} Ecuación de momentos (vectorial, pues $\uu=(u,v,w)$)}
-  \only<3>{{\color{pink}$\bullet$} Ecuación de incompresibilidad }
+  \only<3>{{\color{pink}$\bullet$} Ecuación de incompresibilidad  o de conservación de la masa}
   \only<4->{
   \emph{Datos}:
   \begin{itemize}
-  \item<4-> $\nu>0$: coeficiente de viscosidad (cinemática)
-    \par\hfill ``inverso del número de \textit{Reynolds}'' ($Re \sim 1/\nu$, si $U,L\sim 1$).
+    \setlength\itemsep{0.9em}
+  \item<4-> $\nu>0$: coeficiente de \structure{viscosidad} (cinemática)
+    \par\hfill ``inverso del número de \structure{Reynolds}'' ($Re = U \cdot L/\nu$)\footnote{
+      Denotamos $U$ y $L$: velocidad y longitud características.}
+  \smallskip
       \begin{itemize}
-      \item Caso $Re \gg$ (``$\nu\ll$''): flujo laminar
-      \item Caso $Re \ll$ (``$\nu\gg$''): flujo turbulento
+        \setlength\itemsep{0.8em}
+      \item Caso $Re \ll$ (o bien $\nu\gg$ respecto a $U$, $L$): \textbf{flujo laminar}
+      \item Caso $Re \gg$ (o bien $\nu\ll$ respecto a $U$, $L$): \textbf{flujo turbulento}
       \end{itemize}
     \item<4-> $\ff=(f_1,f_2,f_3)$ fuerza externa que actúa sobre el fluido (ejemplo: gravedad)
   \end{itemize}
@@ -143,27 +168,27 @@
     + \altbox{3}{-2,4-}{\uu\cdot\grad u}
     - \nu \altbox[NavyBlue]{4}{-3,5-}{\Delta u}
     + \altbox[orange]{5}{-4,6-}{\dx p}
-    &= f_1 \text{ en } \Omega
+    &= f_1 \text{ en } \Omega,
     \\
     \altbox[ForestGreen]{2}{-1,3-}{v_t}
     + \altbox{3}{-2,4-}{\uu\cdot\grad v}
     - \nu \altbox[NavyBlue]{4}{-3,5-}{\Delta v}
     + \altbox[orange]{5}{-4,6-}{\dy p}
-    &= f_2 \text{ en } \Omega
+    &= f_2 \text{ en } \Omega,
     \\
     \altbox[ForestGreen]{2}{-1,3-}{w_t}
     + \altbox{3}{-2,4-}{\uu\cdot\grad w}
     - \nu \altbox[NavyBlue]{4}{-3,5-}{\Delta w}
     + \altbox[orange]{5}{-4,6-}{\dz p}
-    &= f_3 \text{ en } \Omega
+    &= f_3 \text{ en } \Omega,
     \\
-    \altbox[pink]{6}{-5}{\div{\uu}} &= 0.
+    \altbox[pink]{6}{-5}{\div{\uu}} &= 0 \text{ en } \Omega.
   \end{align*}
   \nota[ForestGreen]{2}{Variación del flujo con el tiempo, $t$}
   \nota{3}{Términos de inercia \texttt{no lineales} y ``de tipo \textbf{hiperbólico}}
   \nota[NavyBlue]{4}{Términos viscosos o difusivos}
   \nota[orange]{5}{Gradiente de presión}
-  \nota[pink]{6}{Divergencia nula \scriptsize (ecuación de incompresibilidad o de conservación de la masa)}
+  \nota[pink]{6}{Divergencia nula \scriptsize (incompresibilidad)}
 
 %   Los términos más "delicados" (de convección o transporte no lineal)
 %   \begin{align*}
