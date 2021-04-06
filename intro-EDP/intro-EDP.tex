@@ -203,16 +203,75 @@
   \vfill
 \end{frame}
 
-\begin{frame}{Notas (I)}
-
+\begin{frame}{El problema de Poisson (I)}
+  \begin{itemize}
+    \setlength\itemsep{0.9em}
+  \item Nos fijamos en los términos ``más sencillos'': los de tipo difusivo, $-\Delta u$
+  \item A partir de ellos, iremos añadiendo términos más complejos
+  \item El objetivo final:  reconstruir las ecuaciones de Navier-Stokes
+  \end{itemize}
 \end{frame}
 
-\begin{frame}{Notas (II)}
-
+\begin{frame}{El problema de Poisson (II)}
+  Dado un conjunto abierto $\Omega$ (cuya frontera $\partial\Omega$ la
+  podemos dividir en ``una parte Dirichlet'', $\Gamma_D$, y otra
+  ``parte Neumann'', $\Gamma_N$, alguna de las cuales podría ser
+  vacía), planteamos:
+  \begin{equation*}
+    \left\{
+    \begin{aligned}
+      -\Delta u &= f \text{ en } \Omega, \\
+      u&=g_D \text{ sobre } \Gamma_D, \\
+      \grad u \cdot \nn &=g_N \text{ sobre } \Gamma_N.
+    \end{aligned}
+    \right.
+  \end{equation*}
+  Para escribir la formulación variacional, definimos
+  \begin{itemize}
+  \item Un espacio $V$ (espacio para funciones test)
+    $$ V = \{ v\in H^1(\Omega) \ / \ v=0 \text{ sobre } {\Gamma_D} \}$$
+    \begin{flushright}\small
+    En $V$ se recogen las posibles condiciones de contorno
+      Dirichlet que aparezcan en el problema, pero de forma homogénea
+      $(=0)$:
+    \end{flushright}
+\item Un espacio $V_{S}$ (espacio donde buscar la solución del problema)
+    $$ V_S = \{ v\in H^1(\Omega) \ / \ v=g_D \text{ sobre } {\Gamma_D} \}$$
+    \begin{flushright}\small
+    En él se recogen las condiciones de contorno
+      Dirichlet que aparezcan en el problema original
+      \\
+      Si no hay condiciones de contorno Dirichlet, este
+      espacio será igual al de las funciones test ($V_S=V$)
+    \end{flushright}
+  \end{itemize}
 \end{frame}
 
-
-\begin{frame}{Notas (III)}
+\begin{frame}{El problema de Poisson (III)}
+  Y así escribimos la formulación variacional hallar $u\in V_S$ tal
+  que, para todo $v\in V$:
+  \begin{align*}
+      \int_\Omega \grad u \cdot \grad v
+      &- \int_{\partial\Omega} (\grad u \cdot \nn) v
+      \\
+      &=\int_\Omega \grad u \cdot \grad v
+      - \int_{\Gamma_D} (\grad u \cdot \nn) v
+      - \int_{\Gamma_N} (\grad u \cdot \nn) v
+      \\
+      &=\int_\Omega \grad u \cdot \grad v
+      - \int_{\Gamma_N} g_N v
+      = \int_\Omega  f v
+    \end{align*}
+    O bien:
+    $$
+    a(u,v) = L(v),
+    $$
+    donde
+    \begin{equation*}
+      a(u,v)=\int_\Omega \grad u \cdot \grad v,
+      \quad
+      L(v)=  \int_{\Gamma_N} g_N v + \int_\Omega  f v
+    \end{equation*}
 \end{frame}
 
 \begin{frame}{Flujos potenciales (irrotacionales) e incompresibles}
@@ -226,12 +285,12 @@
   $$
   pues
   $$
-  v_x - u_y= (\Psi_{y})_x - (\Psi_{x})_y = \Psi_{yx} - \Psi_{xy}= \Psi_{xy} - \Psi_{xy} =  0.
+  v_x - u_y = (\Psi_{y})_x - (\Psi_{x})_y = \Psi_{yx} - \Psi_{xy} = \Psi_{xy} - \Psi_{xy} = 0.
   $$
 \item Si además el potencial es solución de un problema de Laplace, del tipo
   \begin{align}
     \label{potencial.eq.1}
-    -\Delta \Psi &= 0 \quad text{ en } \Omega, \\
+    -\Delta \Psi &= 0 \quad \text{ en } \Omega, \\
     \label{potencial.eq.2}
     &+ \text{ cond. de contorno},
   \end{align}
