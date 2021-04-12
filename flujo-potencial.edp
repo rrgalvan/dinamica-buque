@@ -21,13 +21,17 @@ Vh psi,w;
 
 solve potential(psi,w, solver=LU)=
   int2d(Th)(dx(psi)*dx(w)+dy(psi)*dy(w))
-  + on(C,psi = y) + on(S,psi=0);
+  + on(C,psi = x); // + on(S,psi=0);
 
 plot(psi,wait=1,
      fill=0, // Rellenar colores?
      value=1, // Representar valores?
      nbiso=70, // Nº de isovalores
      cmm="Flujo potencial");
+
+Vh u = dx(psi);
+Vh v = dy(psi);
+plot([u,v], wait=1);
 
 load "iovtk"
 int[int] ord = [1];

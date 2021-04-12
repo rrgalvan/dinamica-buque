@@ -228,20 +228,20 @@
   \end{equation*}
   Para escribir la formulación variacional, definimos
   \begin{itemize}
-  \item Un espacio $V$ (espacio para funciones test)
+  \item Un espacio vectorial $V$ (espacio para funciones test)
     $$ V = \{ v\in H^1(\Omega) \ / \ v=0 \text{ sobre } {\Gamma_D} \}$$
     \begin{flushright}\small
     En $V$ se recogen las posibles condiciones de contorno
       Dirichlet que aparezcan en el problema, pero de forma homogénea
       $(=0)$:
     \end{flushright}
-\item Un espacio $V_{S}$ (espacio donde buscar la solución del problema)
+\item Un espacio afín $V_{S}$ (espacio donde buscar la solución del problema)
     $$ V_S = \{ v\in H^1(\Omega) \ / \ v=g_D \text{ sobre } {\Gamma_D} \}$$
     \begin{flushright}\small
-    En él se recogen las condiciones de contorno
-      Dirichlet que aparezcan en el problema original
+      En él se recogen las condiciones de contorno Dirichlet que
+      aparezcan en el problema original
       \\
-      Si no hay condiciones de contorno Dirichlet, este
+      Si no hay condiciones de contorno Dirichlet (o si $g_D=0$), este
       espacio será igual al de las funciones test ($V_S=V$)
     \end{flushright}
   \end{itemize}
