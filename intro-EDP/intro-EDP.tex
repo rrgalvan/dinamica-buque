@@ -313,6 +313,124 @@
 \end{frame}
 
 %=======================================================
+\section{Formulación variacional de sistemas evolutivos}
+%=======================================================
+
+%------------------------------------------------------
+\begin{frame}{Ecuación del calor}
+%------------------------------------------------------
+  \begin{itemize}
+
+  \item
+  Fijamos un dominio espacial $\Omega\subset\Rset^n$,
+  con frontera $\partial\Omega=\Gamma_D\cup\Gamma_N$ y un \textbf{intervalo de
+    tiempo} $[0,T]$.
+
+
+\item
+  Planteamos: hallar $u=u(\mathbf{x}, t)$, siendo $\mathbf{x}=(x,y)$ en el caso 2D
+  o $\mathbf{x}=(x,y,z)$ en 3D, solución del problema:
+   \begin{align*}
+   \dt u - \nu\Delta u &= f, \quad \forall(\mathbf{x},t)\text{ de }\Omega\times (0,T), \\
+   u &= g_D \quad\text{ sobre } \Gamma_D \quad \text{(c. de contorno Dirichlet)},\\
+   \grad u\cdot\nn &= g_N \quad\text{ sobre } \Gamma_D \quad \text{(c. de contorno Neumann)},\\
+   u(\mathbf{x},t=0) &= u_0(\mathbf{x}) \quad \text{(condición inicial)}.
+ \end{align*}
+ donde $f(\mathbf{x},t)$, $g_D(\mathbf{x},t)$, $g_N(\mathbf{x},t)$ y
+ $u_0(\mathbf{x})$ son funciones conocidas (datos). $\nu>0$ es también un dato (coeficiente de difusión).
+
+ \vfill
+ \begin{small}
+ \begin{itemize}
+ \item
+   En la ecuación anterior estamos de nuevo dividiendo la frontera de
+   omega en dos zonas: $\partial\Omega=\Gamma_D\cup\Gamma_N$ (para
+   permitir la posibilidad de que se impongan tanto condiciones de
+   contorno de tipo Dirichlet como de tipo Neumann).
+ \item Existiría la posibilidad de que $\Gamma_D=\emptyset$ (y por
+   tanto sólo imponemos condiciones Neumann en
+   $\Gamma_N=\partial\Omega$)) o $\Gamma_N=\emptyset$ (y por tanto
+   $\Gamma_D$ es toda la frontera y sólo imponemos condiciones
+   Dirichlet)
+ \end{itemize}
+\end{small}
+\end{itemize}
+\end{frame}
+
+
+%------------------------------------------------------
+\begin{frame}{Discretización en tiempo}
+%------------------------------------------------------
+  \small
+Consideramos la siguiente partición del \textbf{intervalo de tiempo} $[0,T]$:
+
+$$
+0=t_0 < t_1 < t_2 < \dots < t_m < t_{m+1} < \dots  < t_M=T.
+$$
+\begin{itemize}
+  \item Suponemos que $t_{m+1}-t_m = \Delta t$ (constante).
+  \item Intentamos hallar aproximaciones de la solución $u^m\approx u(t_m)$ ($m=0,1,...,M$).
+\end{itemize}
+Calculamos los valores $u^m$ de la siguiente forma:
+\begin{itemize}
+  \item Inicialización: para $m=0$: $u^0=u_0$ ($u_0$ es el dato inicial).
+  \item Iteración de tiempo $m=1,2,\dots,M$: conocida la solución en
+    la etapa $m-1$, hallamos $u^m$ como solución de:
+    \begin{align}
+      \label{eq:1}
+     \frac{u^m-u^{m-1}}{\Delta t} - \nu\Delta u^m &= f^m \quad\text{ en } \Omega
+     \\
+     u^m &= g_D^m \quad\text{ sobre } \partial\Gamma_D
+           \\
+   \grad u^m\cdot\nn &= g_N^m \quad\text{ sobre } \partial\Gamma_D
+   \end{align}
+   donde $f^m(x)$ y $g^m(x)$ denotan respectivamente a $f(x,t^m)$ y $g(x,t^m)$.
+   \item A este tipo de discretizaciones en tiempo se les llama método de \textbf{Euler implícito}.
+   \item El problema anterior es estacionario (el tiempo $t_m$ está
+     fijo) y lo podemos resolver mediante el MEF como veremos a
+     continuación...
+
+\end{itemize}
+
+\end{frame}
+
+%------------------------------------------------------
+\begin{frame}{Formulación variacional de la Ecuación del Calor}
+%------------------------------------------------------
+  \small
+  En~(\ref{eq:1}) podemos pasar los datos al segundo miembro, obteniendo:
+  \begin{equation}
+    \label{eq:2}
+     \frac{u^m}{\Delta t} - \nu\Delta u^m = \frac{u^{m-1}}{\Delta t} + f^m \quad\text{ en } \Omega
+  \end{equation}
+  Como antes, definimos los espacios de funciones:
+  \begin{itemize}
+  \item Un espacio vectorial $V$ (espacio para funciones test)
+    $$ V = \{ v\in H^1(\Omega) \ / \ v=0 \text{ sobre } {\Gamma_D} \}$$
+\item Un espacio afín $V_{S}$ (espacio donde buscar la solución del problema)
+    $$ V_S = \{ v\in H^1(\Omega) \ / \ v=g_D \text{ sobre } {\Gamma_D} \}$$
+  \end{itemize}
+  Multiplicando por funciones test $\bu\in V$ en~(\ref{eq:2}) e
+  integrando por partes, deducimos que $u^m$ verifica:
+  \begin{align*}
+    \int_\Omega \frac{u^m}{\Delta t} \bu + \int_\Omega \nu\grad u^m \grad\bu
+    - \int_{\partial\Omega} \grad u \cdot \nn \,\bu
+    = \int_\Omega \frac{u^{m-1}}{\Delta t} \bu + \int_\Omega f^m  \bu
+  \end{align*}
+  Y usando (en la integral frontera) que $\bu=0$ sobre $\Gamma_D$ y $\nabla u^m\cdot\nn=g_n$ sobre
+  $\Gamma_N$ llegamos a la formulación variacional para el instante $m$:
+  \begin{align*}
+    \structure{
+    \int_\Omega \frac{u^m}{\Delta t} \bu + \int_\Omega \nu\grad u^m \grad\bu
+    = \int_\Omega \frac{u^{m-1}}{\Delta t} \bu + \int_\Omega f^m  \bu
+    + \int_{\partial\Omega} g^m_N \,\bu
+    }
+  \end{align*}
+\end{frame}
+
+
+
+%=======================================================
 \section{Formulación variacional de las ecuaciones de Stokes}
 %=======================================================
 
@@ -405,58 +523,11 @@
 \end{frame}
 
 
-%=======================================================
-\section{Formulación variacional de sistemas evolutivos}
-%=======================================================
-
-%------------------------------------------------------
-\begin{frame}{Ecuación del calor}
-%------------------------------------------------------
-Fijamos un dominio espacial $\Omega\subset\Rset^n$ y un \textbf{intervalo de tiempo} $[0,T]$.
-
-Planteamos: hallar $u$ solución de
-   \begin{align}
-   \dt u - \Delta u &= f, \quad (x,t)\text{ en }\Omega\times (0,T), \\
-   u(x,t) &= g(x,t) \quad\text{ sobre } \partial\Omega \quad \text{(condición de contorno)},\\
-   u(x,0) &= u_0(x) \quad x\in\Omega, \text{(condición inicial)}.
- \end{align}
- donde $f$, $u_0$ y $g$ son funciones conocidas (datos).
-\end{frame}
-
-
-%------------------------------------------------------
-\begin{frame}{Discretización en tiempo}
-%------------------------------------------------------
-Consideramos la siguiente partición del \textbf{intervalo de tiempo} $[0,T]$:
-
-$$
-0=t_0 < t_1 < t_2 < \dots < t_m < t_{m+1} < \dots  < t_M=T.
-$$
-\begin{itemize}
-  \item Suponemos que $t_{m+1}-t_m = \Delta t$ (constante).
-  \item Intentaremos hallar ciertos valores $u^m\approx u_(t_m)$, para $m=0,1,...,M$.
-\end{itemize}
-Calculamos los valores $u^m$ de la siguiente forma:
-\begin{itemize}
-  \item Inicialización: para $m=0$: $u^0=u_0$ ($u_0$ es el dato inicial).
-  \item Iteración de tiempo $m$: conocida la solución en la etapa $m-1$, hallamos $u^m$ como solución de:
-   \begin{align}
-     \frac{u^m-u^{m-1}}{\Delta t} - \Delta u^m &= f^m \quad\text{ en } \Omega
-     \\
-   u^m &= g^m \quad\text{ sobre } \partial\Omega \quad \text{(condición de contorno)},\\
-   \end{align}
-   donde $f^m(x)$ y $g^m(x)$ denotan respectivamente a $f(x,t^m)$ y $g(x,t^m)$.
-   \item El problema anterior es estacionario (el tiempo $t_m$ está fijo) y lo podemos resolver mediante el MEF.
-   \item A este tipo de discretizaciones en tiempo se les llama método de \textbf{Euler implícito}.
-\end{itemize}
-
-\end{frame}
-
 
 %------------------------------------------------------
 \begin{frame}{Ecuaciones de Stokes de evolución}
 %------------------------------------------------------
-
+  \small
   \alert{Problema de Stokes de evolución} (con condiciones de contorno \alert{Dirichlet}):
 
   \begin{itemize}
