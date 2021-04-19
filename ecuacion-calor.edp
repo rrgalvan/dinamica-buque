@@ -1,0 +1,73 @@
+// Ecuación del calor
+
+load "iovtk" // Para grabar datos en formto VTK (visualizados con Paraview)
+
+// 1) Malla y espacios de elementos finitos ··························
+
+int nx = 10; // Número de subintervalos en cada parte de la frontera
+mesh Th = square(nx,nx); // Cuadrado [0,1]x[0,1] (lados: 1,2,3,4)
+int GammaD = 2; // frontra dirichlet: lado 2 (pared derecha)
+plot(Th, wait=true, dim=3);
+
+fespace Vh(Th, P1); // Vh es un espacio de elementos finitos P1
+Vh u, ub; // Incógnita (solución), función test
+Vh u0; // Aproximación de la solución en la etapa 0\
+
+// 2) Datos ··························································
+
+real nu=1.0;  // Constante de viscosidad
+func f=0;  // Fuerza externa
+func gD = 0;  // Cond. contorno Dirichlet
+func gN = 0;  // Cond. contorno Neumann
+
+real C = 100;
+func uInicial = exp(-C*((x-0.5)^2 + (y-0.5)^2));
+u0 = uInicial;  // Proyección en Vh del dato inicial
+plot(u0, dim=3);
+
+// 3) Formulación variacional ········································
+
+real dt = 0.01;  // Tamaño del paso de tiempo
+int niter = 100;  // Número de iteraciones
+real t = 0.0;  // Instante de tiempo inicial
+
+macro grad(v) [dx(v), dy(v)] // Fin macro
+
+problem ecuacionCalor(u, ub) =
+  // Primer miembro (forma bilineal)
+  int2d(Th)(
+            1/dt * u*ub
+            + nu * grad(u)'*grad(ub)
+            )
+  // Segundo miembro (forma lineal)
+  - int2d(Th)(
+            1/dt * u0*ub
+            + f*ub
+            + gN*ub
+            )
+  // Cond. contorno Dirichlet
+  // + on(GammaD, u=gD)
+  ;
+
+// 4) Cálculo de solución ············································
+
+bool plotIters = true;
+bool saveVTK = true;
+for (int iter=1; iter<=niter; iter++) {
+  t = t + dt; // Incrementar tiempo
+  cout << "Iteraci'on " << iter << ", t=" << t << endl;
+
+  ecuacionCalor; // Resolver problema en la iteración actual
+
+  if(plotIters) {
+    plot(u, cmm="Soluc. t="+t, value=1, fill=1, dim=2);
+  }
+  if(saveVTK) {
+    int[int] polorder=[1]; // Grabar polinomios de orden 1
+    string vtkfile = "/tmp/u_" + iter + ".vtu";
+    savevtk(vtkfile, Th, u, dataname="u", order=polorder);
+  }
+
+  u0 = u; // Actualizar solución anterior para la próxima iteración
+
+ }
