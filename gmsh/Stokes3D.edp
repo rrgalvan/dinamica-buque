@@ -4,16 +4,24 @@ load "tetgen"
 load "iovtk"
 verbosity = 1;
 
-mesh3 Th1 = gmshload3("Stokes3DDominio.msh");
+// Atención: al generar la malla (fichero .msh) a partir de Gmsh,
+// es importante (para que la lea FreeFem++) es importante cuando
+// se exporte con formato msh seleccionar la opción "Version 2 ASCII"
 
-int caraSuperior=30, carasRestantes=31;
+mesh3 Th = gmshload3("Stokes3DDominio.msh");
 
-// savemesh(Th1,"Th33.mesh");
-
+// Etiquetas para las distintas zonas de la frontera. Se pueden leer
+// ejn las primeras líneas del fichero .msh:
 //
-// Transform to FreeFem++ format
-//
-mesh3 Th = tetg(Th1,switch="pqaAAYYQ");// discrétisation de la salle et des racks
+// $PhysicalNames
+// 2
+// 2 29 "CaraSuperior"
+// 2 30 "OtrasCaras"
+// $EndPhysicalNames
+int caraSuperior=29, carasRestantes=30;
+
+// Transform to FreeFem++ format (creo que ya no es necesario)
+// mesh3 Th = tetg(Th1,switch="pqaAAYYQ");// discrétisation de la salle et des racks
 
 
 fespace Xh( Th, P1b );
@@ -40,6 +48,6 @@ solve Stokes( [ u1, u2, u3, p ], [ v1, v2, v3, q ] ) =
 	+ on( carasRestantes, u1 = 0, u2 = 0, u3 = 0 )
         + on( caraSuperior, u1 = g, u2 = 0, u3 = 0 );
 
-// plot( [ u1, u2, u3 ], value = true, wait = true );
+plot( [ u1, u2, u3 ], value = true, wait = true );
 
 savevtk( "/tmp/Stokes3d.vtk", Th, [ u1, u2, u3 ], p, dataname = "Velocidad Presi'on" );
