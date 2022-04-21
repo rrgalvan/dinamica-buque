@@ -1,0 +1,56 @@
+// Parametters
+
+// Mesh construction
+int nIntervals=30;
+
+// mesh Th=square(nIntervals, nIntervals,[x0+(x1-x0)*x, y0+(y1-y0)*y]);// structured mesh
+border C1(t=0,1){ x=t; y=0; label=1;}
+border C2(t=0,1){ x=1; y=t; label=2;}
+border C3(t=0,1){ x=1-t; y=1; label=3;} // Pared superior
+border C4(t=0,1){ x=0; y=1-t; label=4;}
+mesh Th=buildmesh( C1(nIntervals)+C2(nIntervals)+C3(nIntervals)+C4(nIntervals) );
+plot(Th);
+
+int surface=3, bottom=1;
+int[int] walls=[2,4];
+
+// Finite elements and other definitions
+fespace Vh(Th, P2); // Espacio para velocidades
+fespace Ph(Th, P1); // Espacio para presiones
+
+macro grad(u) [dx(u),dy(u)] // Fin de macro
+macro div(u1,u2) (dx(u1)+dy(u2)) //
+
+Vh u, v;  // Incógnitas
+Vh ub, vb; // Funciones test
+Ph p, pb; // Incógnita y f. test presión
+
+real nu=1; // Coef. de Viscosidad
+
+problem Stokes2d([u, v, p], [ub, vb, pb]) =
+  // Primer miembro
+  int2d(Th) (
+	     + nu * ( grad(u)'*grad(ub) )
+	     + nu * ( grad(v)'*grad(vb) )
+	     - p * div(ub, vb)
+	     + pb * div(u, v)
+	     // + p*tp * penaltyEps
+	     )
+   // Segundo miembro
+   - int2d(Th)( 0*ub + 0*vb) // Opcional, porque es cero
+   // Cond. contorno Dirichlet
+   + on(surface, u=1, v=0)
+   + on(bottom, walls, u=0, v=0);
+
+// Compute solution of the problem
+Stokes2d;
+
+
+// Plotting
+
+plot([u,v]);
+
+load "iovtk";
+int[int] Order = [1, 1];
+savevtk("cavidad.vtk", Th, [u, v], p, dataname="Velocidad Presion",
+        order=Order);
