@@ -1,4 +1,5 @@
-\documentclass[9pt, dvipsnames]{beamer}
+\documentclass[9pt, dvipsnames,]{beamer}
+\usepackage[spanish]{babel}
 \usepackage{current-definitions}
 
 % Resolver problemas con negritas en Beamer
@@ -482,23 +483,31 @@ Calculamos los valores $u^m$ de la siguiente forma:
 
 
 \begin{frame}{Ecuaciones de Stokes Estacionarias: Formulación variacional (I)}
+  \small
   \begin{itemize}
-
-  \item Por simplicidad, consideramos condiciones Dirichlet homogéneas en toda la frontera de $\Omega$.
-  \item Definimos los espacio $V=H^1_0(\Omega)$ y
-    $Q=L_0^2(\Omega)$. Multiplicamos, respectivamente, a las tres
+  \item En primer lugar, consideramos condiciones Dirichlet en toda la frontera de $\Omega$. Más adelante estudiamos qué ocurre para condiciones Neumann.
+  \item Definimos $\Gamma_D = \partial\Omega$ (toda la frontera) y consideramos los espacios:
+    \begin{align*}
+      V_S &= \{ \uu=(u,v,w)\in \big[H^1(\Omega)\big]^3 \ / \ u=g_ 1,\ v=g_ 2,\ w=g_3
+            \text{ sobre } {\Gamma_D} \}
+      \\
+      V_0 &= \{ H^1(\Omega) \ /\ v=0 \text{ sobre }\gamma_D \} = H^1_0(\Omega)
+    \end{align*}
+    y
+    $Q=L_0^2(\Omega)$.
+  \item Multiplicamos, respectivamente, a las tres
     ecuaciones de momentos en el problema de Stokes por funciones test
-    $\bu, \bv, \bw \in V$. Multiplicamos la ecuación de divergencia
+    $\bu, \bv, \bw \in V_0$. Multiplicamos la ecuación de divergencia
     por otra función test $q\in Q$.
   \item Integramos por partes cada una de estas ecuaciones, teniendo
     en cuenta que los términos frontera son cero y, por tanto,
     desaparecen. Así obtenemos:
     \begin{align*}
-      \int_\Omega \nu\grad u\grad\bu - \int_\Omega p\dx \bu &= \int_\Omega f_1 \bu, \quad \forall \bu\in V,
+      \int_\Omega \nu\grad u\grad\bu - \int_\Omega p\dx \bu &= \int_\Omega f_1 \bu, \quad \forall \bu\in V_0,
       \\[0.5em]
-      \int_\Omega \nu\grad v\grad\bv - \int_\Omega p\dy \bv &= \int_\Omega f_2 \bv, \quad \forall \bv\in V,
+      \int_\Omega \nu\grad v\grad\bv - \int_\Omega p\dy \bv &= \int_\Omega f_2 \bv, \quad \forall \bv\in V_0,
       \\[0.5em]
-      \int_\Omega \nu\grad w\grad\bw - \int_\Omega p\dz \bw &= \int_\Omega f_3 \bw, \quad \forall \bw\in V,
+      \int_\Omega \nu\grad w\grad\bw - \int_\Omega p\dz \bw &= \int_\Omega f_3 \bw, \quad \forall \bw\in V_0,
       \\[0.5em]
       \int_\Omega \bp \div{\uu} & =  0, \quad \forall \bp \in Q.
     \end{align*}
@@ -511,7 +520,16 @@ Calculamos los valores $u^m$ de la siguiente forma:
 \begin{frame}{Ecuaciones de Stokes Estacionarias: Formulación variacional (II)}
   \begin{itemize}
   \item Sumamos las ecuaciones anteriores y planteamos el problema:
-    Hallar $u,v,w\in H^1_0(\Omega)$ y $p\in L_0^2(\Omega)$ tales que
+    % Hallar $u,v,w\in H^1_0(\Omega)$ y $p\in L_0^2(\Omega)$ tales que
+    \begin{itemize}
+    \item hallar un campo vectorial $\uu=(u,v,w)$ definido
+    en el espacio de soluciones $V_S$ anterior ($u=u(\xx,t)$,
+    $v=v(\xx,t)$, $w=w(\xx,t)$)
+  \item junto a una función de presión $p=p(\xx,t)$,
+    (todas ellas funciones definidas en un conjunto abierto $\Omega$ y
+    con valores en $\Rset$),
+  \end{itemize}
+  tales que:
     \begin{align*}
       \int_\Omega \nu\Big( \grad u\grad\bu &+
       \grad v\grad\bv + \grad w\grad\bw \Big)
@@ -522,7 +540,7 @@ Calculamos los valores $u^m$ de la siguiente forma:
       \\
       &= \int_\Omega \left( f_1 \bu + f_2 \bv + f_3 \bw \right)
     \end{align*}
-    $\forall \bu,\bv, \bw\in V$, $\forall\bp\in Q$.
+    $\forall \bu,\bv, \bw\in V_0$, $\forall\bp\in Q$.
   \end{itemize}
 
 \end{frame}
@@ -545,9 +563,11 @@ Calculamos los valores $u^m$ de la siguiente forma:
       &\ff=(f_1,f_2,f_3):\Omega\times [0,T] \to \Rset^3 \ \text{(fuerza externa)}
     \end{align}
 
-  \item Planteamos: hallar $u=u(\xx,t)$, $v=v(\xx,t)$, $w=w(\xx,t)$
-    $p=p(\xx,t)$, todas ellas funciones definidas en un conjunto
-    abierto $\Omega$ y con valores en $\Rset$, tales que:
+  \item Planteamos: hallar un campo vectorial $\uu=(u,v,w)$ definido
+    en el espacio de soluciones $V_S$ anterior ($u=u(\xx,t)$,
+    $v=v(\xx,t)$, $w=w(\xx,t)$) junto a una función de presión $p=p(\xx,t)$,
+    (todas ellas funciones definidas en un conjunto abierto $\Omega$ y
+    con valores en $\Rset$), tales que:
     \begin{align}
       \dt u &- \nu\Delta u + \dx p = f_1
       \\
@@ -629,7 +649,7 @@ Calculamos los valores $u^m$ de la siguiente forma:
       \big)
        + \int_\Omega \left( f^m_1 \bu + f^m_2 \bv + f^m_3 \bw \right)
     \end{align*}
-    $\forall \bu,\bv, \bw\in V$, $\forall\bp\in Q$.
+    $\forall \bu,\bv, \bw\in V_0$, $\forall\bp\in Q$.
 
 \end{frame}
 
