@@ -28,9 +28,9 @@
   \only<#2>{\matcolbox[#1]{#4}}
   \only<#3>{\matcolbox[white]{#4}{}}
 }
-\newcommand{\nota}[3][red]{%
-  \only<#2>{{\color{#1}$\bullet$} #3}}
+\newcommand{\nota}[3][red]{\only<#2>{{\color{#1}$\bullet$} #3}}
 
+\newcommand{\Vtest}{\ensuremath{V_0}}
 
 %=======================================================
 \begin{document}
@@ -40,6 +40,21 @@
 \maketitle
 \end{frame}
 
+\begin{frame}{Magnitudes escalares y vectoriales}
+  \begin{itemize}\itemsep0.5em
+    \item Consideramos una función, $u$, que representará una \textbf{magnitud} (por ejemplo temperatura, presión, velocidad)
+    \item Esta magnitud $u$ estará definida sobre un \textbf{dominio espacial} $d$--dimensional (en la práctica, $d=1$, $d=2$ o $d=3$), al que denotaremos $\Omega\subset\Rset^d$
+  \item Por tanto, $u$ asocia a cada punto $\xx=(x_1,x_2,\dots,x_d)\in\Rset^d$ un número real, $u(\xx)=u(x_1,x_2,....,x_d)\in\Rset$
+  \item También consideraremos \textbf{magnitudes vectoriales}, por ejemplo un campo de velocidades
+    $$\uu(\xx) =  (u_1(\xx), u_2(\xx),..., u_d(\xx))\in\Rset^d,$$ 
+  para todo $\xx=(x_1,x_2,\dots,x_d)\in\Rset^d$
+\item En ocasiones, estas magnitudes variarán también en un intervalo de \textbf{tiempo} dado, $[0,T]$ (siendo $t=0$ el instante inicial y $t=T$ el instante final de tiempo considerado).
+\item 
+  En \textbf{resumen}: para cada $\xx=(x_1,x_2,\dots,x_d)\in\Omega\subset\Rset^d$ y para cada $t\in [0,T]$, tendremos un valor 
+  $$u=u(\xx,t)\in\Rset$$ 
+o, en el caso escalar, $u=u(\xx,t)\in\Rset^d$.
+\end{itemize}
+\end{frame}
 
 \begin{frame}{Ecuaciones en Derivadas Parciales (EDP)}
   \structure{\textbf{Tipos de EDP}} (lineales y de orden $\le 2$):
@@ -58,28 +73,29 @@
     \par\quad Ejemplo canónico: \textbf{ecuación de transporte}:
       \begin{align*}
         u_t + \mathbf{v} \grad u = f,
+        \quad \only<2->{\structure{\text{ en  } \Omega}}
       \end{align*}
       \quad donde $\vv$ es un dato (vector que transporta a $u$).
   \end{itemize}
   \medskip
-  \uncover<2->{\alert{Condiciones de contorno} (adicionales sobre
-    $\partial\Omega$, unicidad de solución)
+  \uncover<2->{\structure{\bf Condiciones de contorno} sobre
+    \structure{$\partial\Omega$} (unicidad de solución)
     \smallskip
   \begin{itemize}
   \item
     \only<2-3>{ \alert{$u=\structure g$} \quad
-          sobre $\partial\Omega$ \ (Cond. Contorno
+          sobre $\partial\Omega$ \ (Condiciones de Contorno
         \textbf{Dirichlet}, \structure{$g$: dato})}
     \only<4-5>{\alert{$u=\structure 0$} \quad
-          sobre $\partial\Omega$ \ (Cond. Contorno
-        \textbf{Dirichlet \structure{Homogéneas}})}
+          sobre $\partial\Omega$ \ (Condición de Contorno
+        \textbf{Dirichlet} {Homogénea})}
   \item
     \only<3>{ \alert{$\grad u\cdot\nn = \structure g$} \quad
           sobre $\partial\Omega$ \ (Cond. Contorno
         \textbf{Neumann}, \structure{$g$: dato})}
     \only<5>{ \alert{$\grad u\cdot\nn =\structure 0$} \quad
           sobre $\partial\Omega$ \ (Cond. Contorno
-        \textbf{Neumann \structure{Homogéneas}})}
+        \textbf{Neumann} {Homogénea})}
   % \item
   %   \only<2>{\bullet\ & \color{NavyBlue} \grad u \cdot \nn
   %     {\color{NavyBlue}={\color{NavyBlue}g} \quad\text{ sobre
@@ -282,16 +298,12 @@
 
 \begin{frame}{Flujos potenciales (irrotacionales) e incompresibles}
 \begin{itemize}
-\item Suponemos que existe una función potencial, $\Phi$, tal que
-  el flujo se puede obtener como el gradiente de este potencial, es decir
-  $$u=\Psi_x, \ v=\Psi_y$$.
-  \item Entonces, el flujo es \alert{irrotacional}:
+\item Suponemos que existe una función potencial, $\Psi$, tal que
+  $$u=\Psi_y, \ v=-\Psi_x$$
+    \hfill{\scriptsize (el flujo es ortogonal a $\nabla\Psi$, o sea paralelo a las líneas de corriente $\Psi=Cte$)}
+  \item Entonces, el flujo es \alert{incompresible}, pues se tiene
   $$
-  rot(u,v,w) = 0\cdot \vec{i} + 0\cdot \vec j + (v_x - u_y)\cdot \vec k = 0,
-  $$
-  pues
-  $$
-  v_x - u_y = (\Psi_{y})_x - (\Psi_{x})_y = \Psi_{yx} - \Psi_{xy} = \Psi_{xy} - \Psi_{xy} = 0.
+  \nabla\cdot(u,v) = u_x + v_y = (\Psi_{y})_x - (\Psi_{x})_y = (\Psi_{x})_y - (\Psi_{x})_y   =  0.
   $$
 \item Si además el potencial es solución de un problema de Laplace, del tipo
   \begin{align}
@@ -300,9 +312,13 @@
     \label{potencial.eq.2}
     &+ \text{ cond. de contorno},
   \end{align}
-  entonces el flujo es \alert{incompresible}:
+  entonces el flujo $(u,v)$ es \alert{incompresible}, pues
   $$
-  \nabla\cdot(u,v) = u_x + v_y =\Psi_{xx} + \Psi_{yy} =  0.
+  rot(u,v,w) = 0\cdot \vec{i} + 0\cdot \vec j + (v_x - u_y)\cdot \vec k = 0,
+  $$
+  porque
+  $$
+  v_x - u_y = (-\Psi_{x})_x - (\Psi_{y})_y = -\Delta\Psi = 0.
   $$
 \item Así, para determinar un flujo irrotacional e incompresible en
   cualquier dominio $\Omega\subset\Rset^2$, basta proceder como sigue:
@@ -313,9 +329,20 @@
   \item Tomar el flujo $u=\Psi_x$, $v=\Psi_y$.
   \end{enumerate}
 
-
 \end{itemize}
 
+\end{frame}
+
+\begin{frame}{Ejemplo flujo potencial}
+  \begin{center}
+    \includegraphics[width=0.5\linewidth]{flujo-potencial}
+  \end{center}
+  \begin{itemize}
+    \item EDP: $-\Delta\Psi = 0$ en $\Omega$.
+    \item $\Omega$: dominio definido por un círculo externo, $C$, y un perfil naca interno, $S$.
+    \item Condiciones de contorno: $\Psi(x,y)=y$ sobre $C$, $\Psi=0$ sobre S.
+    \item Gráfica: isolíneas de  $\Psi$
+  \end{itemize}
 \end{frame}
 
 %=======================================================
@@ -491,23 +518,23 @@ Calculamos los valores $u^m$ de la siguiente forma:
       V_S &= \{ \uu=(u,v,w)\in \big[H^1(\Omega)\big]^3 \ / \ u=g_ 1,\ v=g_ 2,\ w=g_3
             \text{ sobre } {\Gamma_D} \}
       \\
-      V_0 &= \{ H^1(\Omega) \ /\ v=0 \text{ sobre }\gamma_D \} = H^1_0(\Omega)
+      \Vtest &= \{ H^1(\Omega) \ /\ v=0 \text{ sobre }\gamma_D \} = H^1_0(\Omega)
     \end{align*}
     y
     $Q=L_0^2(\Omega)$.
   \item Multiplicamos, respectivamente, a las tres
     ecuaciones de momentos en el problema de Stokes por funciones test
-    $\bu, \bv, \bw \in V_0$. Multiplicamos la ecuación de divergencia
+    $\bu, \bv, \bw \in \Vtest$. Multiplicamos la ecuación de divergencia
     por otra función test $q\in Q$.
   \item Integramos por partes cada una de estas ecuaciones, teniendo
     en cuenta que los términos frontera son cero y, por tanto,
     desaparecen. Así obtenemos:
     \begin{align*}
-      \int_\Omega \nu\grad u\grad\bu - \int_\Omega p\dx \bu &= \int_\Omega f_1 \bu, \quad \forall \bu\in V_0,
+      \int_\Omega \nu\grad u\grad\bu - \int_\Omega p\dx \bu &= \int_\Omega f_1 \bu, \quad \forall \bu\in \Vtest,
       \\[0.5em]
-      \int_\Omega \nu\grad v\grad\bv - \int_\Omega p\dy \bv &= \int_\Omega f_2 \bv, \quad \forall \bv\in V_0,
+      \int_\Omega \nu\grad v\grad\bv - \int_\Omega p\dy \bv &= \int_\Omega f_2 \bv, \quad \forall \bv\in \Vtest,
       \\[0.5em]
-      \int_\Omega \nu\grad w\grad\bw - \int_\Omega p\dz \bw &= \int_\Omega f_3 \bw, \quad \forall \bw\in V_0,
+      \int_\Omega \nu\grad w\grad\bw - \int_\Omega p\dz \bw &= \int_\Omega f_3 \bw, \quad \forall \bw\in \Vtest,
       \\[0.5em]
       \int_\Omega \bp \div{\uu} & =  0, \quad \forall \bp \in Q.
     \end{align*}
@@ -540,7 +567,7 @@ Calculamos los valores $u^m$ de la siguiente forma:
       \\
       &= \int_\Omega \left( f_1 \bu + f_2 \bv + f_3 \bw \right)
     \end{align*}
-    $\forall \bu,\bv, \bw\in V_0$, $\forall\bp\in Q$.
+    $\forall \bu,\bv, \bw\in \Vtest$, $\forall\bp\in Q$.
   \end{itemize}
 
 \end{frame}
@@ -649,7 +676,7 @@ Calculamos los valores $u^m$ de la siguiente forma:
       \big)
        + \int_\Omega \left( f^m_1 \bu + f^m_2 \bv + f^m_3 \bw \right)
     \end{align*}
-    $\forall \bu,\bv, \bw\in V_0$, $\forall\bp\in Q$.
+    $\forall \bu,\bv, \bw\in \Vtest$, $\forall\bp\in Q$.
 
 \end{frame}
 

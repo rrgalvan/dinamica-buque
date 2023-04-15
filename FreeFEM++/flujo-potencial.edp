@@ -19,19 +19,17 @@ mesh Th= buildmesh(C(50)+Splus(70)+Sminus(70));
 fespace Vh(Th,P2);
 Vh psi,w;
 
+real veloc=10; // Velocidad de entrada: veloc*y
+
 solve potential(psi,w, solver=LU)=
   int2d(Th)(dx(psi)*dx(w)+dy(psi)*dy(w))
-  + on(C,psi = x); // + on(S,psi=0);
+  + on(C,psi = y) + on(S,psi=0);
 
-plot(psi,wait=1,
-     fill=0, // Rellenar colores?
-     value=1, // Representar valores?
-     nbiso=70, // Nº de isovalores
-     cmm="Flujo potencial");
+Vh u = dy(psi);
+Vh v = -dx(psi);
+plot([u,v], wait=1, ps="/tmp/a.jpg", cmm="Flujo potencial (u,v)");
+plot(psi, nbiso=50, value=1, cmm="Flujo potencial, psi=Cte");
 
-Vh u = dx(psi);
-Vh v = dy(psi);
-plot([u,v], wait=1);
 
 load "iovtk"
 int[int] ord = [1];
