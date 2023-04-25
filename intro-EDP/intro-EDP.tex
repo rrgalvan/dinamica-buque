@@ -30,7 +30,11 @@
 }
 \newcommand{\nota}[3][red]{\only<#2>{{\color{#1}$\bullet$} #3}}
 
-\newcommand{\Vtest}{\ensuremath{V_0}}
+\newcommand{\Vtest}{\ensuremath{V}}
+\newcommand{\Vsol}{\ensuremath{V_{\text{sol}}}}
+\newcommand{\VsolU}{\ensuremath{\Vsol^u}}
+\newcommand{\VsolV}{\ensuremath{\Vsol^v}}
+\newcommand{\VsolW}{\ensuremath{\Vsol^w}}
 
 %=======================================================
 \begin{document}
@@ -419,9 +423,7 @@ Calculamos los valores $u^m$ de la siguiente forma:
    \end{align}
    donde $f^m(x)$ y $g^m(x)$ denotan respectivamente a $f(x,t^m)$ y $g(x,t^m)$.
    \item A este tipo de discretizaciones en tiempo se les llama método de \textbf{Euler implícito}.
-   \item El problema anterior es estacionario (el tiempo $t_m$ está
-     fijo) y lo podemos resolver mediante el MEF como veremos a
-     continuación...
+   \item El problema anterior es estacionario (para cada $m$, el tiempo $t_m$ está fijo) y lo podemos resolver mediante el MEF como veremos a continuación...
 
 \end{itemize}
 
@@ -496,11 +498,11 @@ Calculamos los valores $u^m$ de la siguiente forma:
     \end{align*}
     junto a las condiciones de contorno (para los datos frontera $g_1$, $g_2$ y $g_3$)
     \begin{align*}
-      u(\xx,t)=g_1(\xx),
+      u(\xx,t)=g_u(\xx),
       \quad
-      v(\xx,t)=g_2(\xx),
+      v(\xx,t)=g_v(\xx),
       \quad
-      w(\xx,t)=g_3(\xx),
+      w(\xx,t)=g_w(\xx),
       \qquad
     \forall \xx\in\partial\Omega.
     \end{align*}
@@ -510,25 +512,41 @@ Calculamos los valores $u^m$ de la siguiente forma:
 
 
 \begin{frame}{Ecuaciones de Stokes Estacionarias: Formulación variacional (I)}
-  \small
-  \begin{itemize}
-  \item En primer lugar, consideramos condiciones Dirichlet en toda la frontera de $\Omega$. Más adelante estudiamos qué ocurre para condiciones Neumann.
-  \item Definimos $\Gamma_D = \partial\Omega$ (toda la frontera) y consideramos los espacios:
+     En primer lugar, suponemos que \textbf{todas las componentes de la velocidad} tienen \textbf{condiciones \alert{Dirichlet}} en \textbf{toda la frontera} de $\Omega$. Más adelante estudiamos qué ocurre para condiciones Neumann.
+     \bigskip
+
+  \begin{itemize}\itemsep=0.6em
+    \item Definimos $\Gamma_D = \partial\Omega$ (toda la frontera) y consideramos para las componentes de la velocidad los espacios (para soluciones y funciones test, respectivamente):
     \begin{align*}
-      V_S &= \{ \uu=(u,v,w)\in \big[H^1(\Omega)\big]^3 \ / \ u=g_ 1,\ v=g_ 2,\ w=g_3
+      \VsolU &= \{ u\in H^1(\Omega) \ / \ u=g_{\alert u} 
             \text{ sobre } {\Gamma_D} \}
       \\
-      \Vtest &= \{ H^1(\Omega) \ /\ v=0 \text{ sobre }\gamma_D \} = H^1_0(\Omega)
+      \VsolV &= \{ v\in H^1(\Omega) \ / \ v=g_{\alert v}
+            \text{ sobre } {\Gamma_D} \}
+      \\
+      \VsolW &= \{ w\in H^1(\Omega) \ / \ w=g_{\alert w}
+            \text{ sobre } {\Gamma_D} \}
+      \\[0.66em]
+      \Vtest &= \{ \bv \in H^1(\Omega) \ /\ \bv=0 \text{ sobre }\Gamma_D \} \quad \big(= H^1_0(\Omega)\;\big)
     \end{align*}
-    y
-    $Q=L_0^2(\Omega)$.
+  \item Para la presión (y para la función test asociada) definimos el espacio: 
+    $$Q=L_0^2(\Omega) = \{q\in L^2(\Omega) \quad\text{tales que$^1$} \int_\Omega q = 0\}$$.
+  \end{itemize}
+\scriptsize\hfill{$^1$Esta última condición se añade para asegurar unicidad de solución de las ecuaciones}
+\end{frame}
+
+\begin{frame}{Ecuaciones de Stokes Estacionarias: Formulación variacional (II)}
+
+  Una vez definidos los espacios de funciones, en los que hemos tenido en cuenta las condiciones Dirichlet:
+  \bigskip
+
+\begin{itemize}\itemsep=0.6em
   \item Multiplicamos, respectivamente, a las tres
     ecuaciones de momentos en el problema de Stokes por funciones test
     $\bu, \bv, \bw \in \Vtest$. Multiplicamos la ecuación de divergencia
     por otra función test $q\in Q$.
   \item Integramos por partes cada una de estas ecuaciones, teniendo
-    en cuenta que los términos frontera son cero y, por tanto,
-    desaparecen. Así obtenemos:
+    en cuenta que los términos frontera desaparecen (porque las funciones tests son cero en la frontera). Así obtenemos:
     \begin{align*}
       \int_\Omega \nu\grad u\grad\bu - \int_\Omega p\dx \bu &= \int_\Omega f_1 \bu, \quad \forall \bu\in \Vtest,
       \\[0.5em]
@@ -549,12 +567,10 @@ Calculamos los valores $u^m$ de la siguiente forma:
   \item Sumamos las ecuaciones anteriores y planteamos el problema:
     % Hallar $u,v,w\in H^1_0(\Omega)$ y $p\in L_0^2(\Omega)$ tales que
     \begin{itemize}
-    \item hallar un campo vectorial $\uu=(u,v,w)$ definido
-    en el espacio de soluciones $V_S$ anterior ($u=u(\xx,t)$,
-    $v=v(\xx,t)$, $w=w(\xx,t)$)
-  \item junto a una función de presión $p=p(\xx,t)$,
-    (todas ellas funciones definidas en un conjunto abierto $\Omega$ y
-    con valores en $\Rset$),
+    \item hallar un campo vectorial $\uu=(u,v,w)$, donde $u=u(\xx,t)$,
+    $v=v(\xx,t)$, $w=w(\xx,t)$ están definidos en los espacios $\VsolU$, $\VsolV$ y $\VsolW$ respectivamente,
+  \item junto a una función de presión $p=p(\xx,t)$ del espacio $Q$ 
+    (todas ellas son funciones con valores $\xx$ en $\Omega$ y con $t\in [0,T]$)
   \end{itemize}
   tales que:
     \begin{align*}
@@ -632,21 +648,21 @@ Calculamos los valores $u^m$ de la siguiente forma:
     abierto $\Omega$, tales que:
     \begin{align}
       \frac{u^m - u^{m-1}}{\Delta t} &- \nu\Delta u^m + \dx p^m = f^m_1
-      \\
+      \\[0.7em]
       \frac{v^m - v^{m-1}}{\Delta t} &- \nu\Delta v^m + \dy p^m = f^m_2
-      \\
+      \\[0.7em]
       \frac{w^m - w^{m-1}}{\Delta t} &- \nu\Delta w^m + \dz p^m = f^m_3
-      \\
+      \\[0.8em]
       \div{\uu^m} &= \dx u^m + \dy v^m + \dz w^m = 0,
     \end{align}
-    junto a las condiciones de contorno (para los datos frontera $g_1$, $g_2$ y $g_3$)
+    junto a las condiciones de contorno (para los datos frontera $g_1$, $g_2$ y $g_3$):
     \begin{align}
       u^m=g_1^m
       \quad
       v^m(\xx,t)=g_2^m
       \quad
       w^m(\xx,t)=g_3^m
-      \\
+      \\[0.5em]
     \forall \xx\in\partial\Omega
     \end{align}
   \end{itemize}
