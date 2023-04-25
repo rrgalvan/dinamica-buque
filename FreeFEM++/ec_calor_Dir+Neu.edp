@@ -1,0 +1,47 @@
+// Parámetros y datos del problema .......
+real R = 1;  // radio del círculo
+real nx = 50;  // Nº de puntos en la frontera (malla) 
+real dt = 0.1;  // Paso entre dos instantes de tiempo 
+int  numIterT = 20; // Número de iteraciones de tiempo
+real Tmax = numIterT*dt;  // Tiempo máximo
+real gDirichlet = 30;  // Dato frontera Dirichlet
+real gNeumann = 0;  // Dato frontera Neumann
+real nu = 1; // Coef. de viscosidad
+func uInicial = 20*x;  // Condición inicial
+func f = 0;  // Fuerza externa
+//........................................
+
+// Malla
+border GammaD(a=0, pi/2) { x=R*cos(a); y=R*sin(a); }
+border GammaN(a=pi/2, 2*pi) { x=R*cos(a); y=R*sin(a); }
+mesh Th = buildmesh( GammaD(nx) + GammaN(2*nx) );
+//plot(Th);
+
+// Espacios de E.F. (Finite Element Spaces)
+fespace V(Th, P1);
+V u, ub; // La incógnita y función test están en V
+V u0;  // Solución en la etapa anterior
+
+u0 = uInicial;  // Temperatura en t=0; 
+
+// Formulación variacional
+macro grad(u) [dx(u), dy(u)]  // Fin macro
+problem Calor(u, ub) =
+    int2d(Th)(u*ub/dt + nu*grad(u)'*grad(ub))
+    - int2d(Th)(u0*ub/dt + f*ub) 
+    //- int1d(Th, GammaN)(gNeumann*ub)
+    + on(GammaD, u=gDirichlet);
+    
+// Bucle de iteraciones en tiempo
+real t = 0;  // Tiempo
+plot(u0, wait=1, fill=1, value=1);
+
+for (int m=0; m<numIterT; m++) {
+    t = t+dt;
+    cout << "m=" << m << ", t=" << t << endl;
+    // a) Resolver el problema
+    Calor;  // Resuelve el problema y calcula u
+    // b) Preparar la siguiente iteración
+    u0 = u;
+    plot(u, wait=1, fill=1, value=1);
+}
